@@ -119,13 +119,13 @@ deployToWildFly(){
   cd distributed-webapp
   mvn clean install
   cd -
-  cp -f distributed-webapp/target/clusterbench-ee7-web.war $WLF_DIRECTORY/WFL1/standalone/deployments/
+  cp -f distributed-webapp/target/distributed-webapp.war $WLF_DIRECTORY/WFL1/standalone/deployments/
   sleep 5
-  cp -f distributed-webapp/target/clusterbench-ee7-web.war $WLF_DIRECTORY/WFL2/standalone/deployments/
+  cp -f distributed-webapp/target/distributed-webapp.war $WLF_DIRECTORY/WFL2/standalone/deployments/
   sleep 5
-  cp -f distributed-webapp/target/clusterbench-ee7-web.war $WLF_DIRECTORY/WFL3/standalone/deployments/
+  cp -f distributed-webapp/target/distributed-webapp.war $WLF_DIRECTORY/WFL3/standalone/deployments/
   sleep 5
-  cp -f distributed-webapp/target/clusterbench-ee7-web.war $WLF_DIRECTORY/WFL4/standalone/deployments/
+  cp -f distributed-webapp/target/distributed-webapp.war $WLF_DIRECTORY/WFL4/standalone/deployments/
   sleep 5
 }
 
@@ -188,28 +188,28 @@ echo ''
 first_print=true
 while true; do
   echo -n -e "\rSESSION DATA: "
-  curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8180/clusterbench-ee7-web/session
+  curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8180/distributed-webapp/session
   sleep 1
   echo -n " "
-  curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8280/clusterbench-ee7-web/session
+  curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8280/distributed-webapp/session
   sleep 1
   echo -n " "
-  curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8380/clusterbench-ee7-web/session
+  curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8380/distributed-webapp/session
   sleep 1
   echo -n " "
-  curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8480/clusterbench-ee7-web/session
+  curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8480/distributed-webapp/session
   sleep 1
   echo -n " "
-  curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8180/clusterbench-ee7-web/session
+  curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8180/distributed-webapp/session
   sleep 1
   echo -n " "
-  curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8280/clusterbench-ee7-web/session
+  curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8280/distributed-webapp/session
   sleep 1
   echo -n " "
-  curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8380/clusterbench-ee7-web/session
+  curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8380/distributed-webapp/session
   sleep 1
   echo -n " "
-  curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8480/clusterbench-ee7-web/session
+  curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8480/distributed-webapp/session
   sleep 1
   if [[ "$first_print" = true ]] ; then
         echo -n -e "\t\t\t(press CTRL+C to exit)"

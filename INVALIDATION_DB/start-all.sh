@@ -37,7 +37,6 @@ addUsers(){
   echo '======================================='
   echo 'ADDING USERS'
   echo '======================================='
-
   $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
   $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
   $WLF_DIRECTORY/WFL3/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
@@ -50,22 +49,6 @@ addUsers(){
   $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u ejb -p test
   $WLF_DIRECTORY/WFL3/bin/add-user.sh -a -u ejb -p test
   $WLF_DIRECTORY/WFL4/bin/add-user.sh -a -u ejb -p test
-}
-
-startPrometheus(){
-  echo ''
-  echo '======================================='
-  echo "STARTING PROMETHEUS"
-  echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.7 --title="Prometheus" -- docker run --name=prometheus --rm --network host --mount type=bind,source=$WLF_DIRECTORY,target=/etc/prometheus/ prom/prometheus
-}
-
-startGrafana(){
-  echo ''
-  echo '======================================='
-  echo "STARTING GRAFANA"
-  echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.7 --title="Grafana" -- docker run --name=grafana --rm --network host grafana/grafana
 }
 
 downloadWildFly(){
@@ -114,6 +97,35 @@ downloadWildFly(){
   fi
 }
 
+deployJdbcDriver(){
+  echo ''
+  echo '======================================='
+  echo "COPY JDBC JAR TO WILDFLY"
+  echo '======================================='
+  if [[ ! -f $JDBC_DRIVER_JAR ]] ; then
+    wget -O $JDBC_DRIVER_JAR $JDBC_DRIVER_DOWNLOAD_URL
+  fi
+  cp -f $JDBC_DRIVER_JAR $WLF_DIRECTORY/WFL1/standalone/deployments/
+  cp -f $JDBC_DRIVER_JAR $WLF_DIRECTORY/WFL2/standalone/deployments/
+  cp -f $JDBC_DRIVER_JAR $WLF_DIRECTORY/WFL3/standalone/deployments/
+  cp -f $JDBC_DRIVER_JAR $WLF_DIRECTORY/WFL4/standalone/deployments/
+}
+
+configureWildFly(){
+  echo ''
+  echo '======================================='
+  echo "CONFIGURE WILDFLY"
+  echo '======================================='
+  $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=configuration.cli
+  sleep 2
+  $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=configuration.cli
+  sleep 2
+  $WLF_DIRECTORY/WFL3/bin/jboss-cli.sh --file=configuration.cli
+  sleep 2
+  $WLF_DIRECTORY/WFL4/bin/jboss-cli.sh --file=configuration.cli
+  sleep 2
+}
+
 deployToWildFly(){
   cd distributed-webapp
   mvn clean install
@@ -128,14 +140,26 @@ deployToWildFly(){
   sleep 5
 }
 
+startPostgres(){
+  echo ''
+  echo '======================================='
+  echo "STARTING PROMETHEUS"
+  echo '======================================='
+  gnome-terminal --geometry=140x35 --window --zoom=0.7 --title="Postgres" -- docker run --name=postgres --rm --network host -e POSTGRES_USER=$POSTGRES_USER -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e POSTGRES_DB=$POSTGRES_DB postgres
+}
+
 # ================
 # START
 # ================
 
 export WIDLFLY_ZIP=/tmp/METRICS/wildfly.zip
-export WLF_DIRECTORY=/tmp/METRICS
+export POSTGRES_PASSWORD=postgres
+export POSTGRES_USER=postgres
+export POSTGRES_DB=postgres
+export JDBC_DRIVER_DOWNLOAD_URL=http://www.qa.jboss.com/jdbc-drivers-products/EAP/7.3.0/postgresql101/jdbc4/postgresql-42.2.2.jar
+export JDBC_DRIVER_JAR=postgresql-connector.jar
+export WLF_DIRECTORY=/tmp/INVALIDATION_DB
 mkdir -p $WLF_DIRECTORY
-cp -f prometheus.yml $WLF_DIRECTORY
 
 echo ''
 echo '======================================='
@@ -151,52 +175,32 @@ rm -f /tmp/cookies3
 rm -f /tmp/cookies4
 sleep 3
 
+startPostgres
+sleep 10
+
 downloadWildFly
 sleep 3
 
-startWFL1 &
+addUsers
+
+deployJdbcDriver
+
+configureWildFly
+
+startWFL1
 sleep 5
 
-startWFL2 &
+startWFL2
 sleep 5
 
-startWFL3 &
+startWFL3
 sleep 5
 
-startWFL4 &
+startWFL4
 sleep 5
-
-startPrometheus &
-sleep 10
-
-startGrafana &
-sleep 20
 
 deployToWildFly
-
-echo ''
-echo '======================================='
-echo "CREATING GRAFANA DATASOURCE TO PROMETHEUS"
-echo '======================================='
-curl --user admin:admin --request POST --header "Content-Type: application/json" --data '{"name":"prometheus_datasource","type":"prometheus","url":"http://localhost:9090","access":"direct","basicAuth":false}' http://localhost:3000/api/datasources
-sleep 10
-
-echo ''
-echo ''
-echo '======================================='
-echo "CREATING GRAFANA DASHBOARD"
-echo '======================================='
-curl --user admin:admin --request POST --header "Content-Type: application/json" --data @dashboard.json http://localhost:3000/api/dashboards/db
-sleep 10
-
-echo ''
-echo ''
-echo ''
-echo "---------------------------------------------------------------------------------------------"
-echo "Now access Grafana at 'http://localhost:3000/' with username 'admin' and password 'admin'"
-echo "Now access Prometheus at 'http://localhost:9090'"
-echo "---------------------------------------------------------------------------------------------"
-echo ''
+sleep 5
 
 echo ''
 first_print=true
@@ -230,3 +234,4 @@ while true; do
         first_print=false
   fi
 done
+

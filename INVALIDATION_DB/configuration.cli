@@ -1,0 +1,14 @@
+embed-server --std-out=echo --server-config=standalone-ha.xml
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload:add()
+/subsystem=infinispan/cache-container=web/invalidation-cache==offload/component=transaction:write-attribute(name=mode, value=BATCH)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=locking:write-attribute(name=isolation, value=REPEATABLE_READ)
+data-source add --name=testDS --jndi-name=java:jboss/datasources/testDS --driver-name=postgresql-connector.jar --connection-url=jdbc:postgresql://127.0.0.1:5432/postgres --enabled=true --jta=true --use-java-context=true --transaction-isolation=TRANSACTION_READ_COMMITTED --min-pool-size=1 --max-pool-size=5 --pool-prefill=true --user-name=postgres --password=postgres --prepared-statements-cache-size=32 --share-prepared-statements=true
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc:add(data-source=testDS,fetch-state=false,passivation=false,purge=false,shared=true,dialect=POSTGRES){allow-resource-service-restart=true}
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=prefix,value=s)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=id-column.name,value=id)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=id-column.type,value=VARCHAR(255))
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=data-column.name,value=datum)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=data-column.type,value=BYTEA)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=timestamp-column.name,value=version)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=timestamp-column.type,value=BIGINT)
+/subsystem=infinispan/cache-container=web:write-attribute(name=default-cache, value=offload)

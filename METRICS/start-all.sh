@@ -5,7 +5,7 @@ startWFL1(){
   echo '======================================='
   echo "STARTING WFL1"
   echo '======================================='
-  gnome-terminal --geometry=120x30 --window --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
+  gnome-terminal --geometry=140x35 --window --zoom=0.7 --working-directory=$WLF_DIRECTORY/WFL1 --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
 }
 
 startWFL2(){
@@ -13,7 +13,7 @@ startWFL2(){
   echo '======================================='
   echo "STARTING WFL2"
   echo '======================================='
-  gnome-terminal --geometry=120x30 --window --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
+  gnome-terminal --geometry=140x35 --window --zoom=0.7 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
 }
 
 startWFL3(){
@@ -21,7 +21,7 @@ startWFL3(){
   echo '======================================='
   echo "STARTING WFL3"
   echo '======================================='
-  gnome-terminal --geometry=120x30 --window --title="WFL3" -- $WLF_DIRECTORY/WFL3/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL3 -Djboss.node.name=WFL3 -Djboss.socket.binding.port-offset=300
+  gnome-terminal --geometry=140x35 --window --zoom=0.7 --working-directory=$WLF_DIRECTORY/WFL3 --title="WFL3" -- $WLF_DIRECTORY/WFL3/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL3 -Djboss.node.name=WFL3 -Djboss.socket.binding.port-offset=300
 }
 
 startWFL4(){
@@ -29,7 +29,7 @@ startWFL4(){
   echo '======================================='
   echo "STARTING WFL4"
   echo '======================================='
-  gnome-terminal --geometry=120x30 --window --title="WFL4" -- $WLF_DIRECTORY/WFL4/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL4 -Djboss.node.name=WFL4 -Djboss.socket.binding.port-offset=400
+  gnome-terminal --geometry=140x35 --window --zoom=0.7 --working-directory=$WLF_DIRECTORY/WFL4 --title="WFL4" -- $WLF_DIRECTORY/WFL4/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL4 -Djboss.node.name=WFL4 -Djboss.socket.binding.port-offset=400
 }
 
 addUsers(){
@@ -57,7 +57,7 @@ startPrometheus(){
   echo '======================================='
   echo "STARTING PROMETHEUS"
   echo '======================================='
-  gnome-terminal --geometry=120x30 --window --title="Prometheus" -- docker run --name=prometheus --rm --network host --mount type=bind,source=$WLF_DIRECTORY,target=/etc/prometheus/ prom/prometheus
+  gnome-terminal --geometry=140x35 --window --zoom=0.7 --title="Prometheus" -- docker run --name=prometheus --rm --network host --mount type=bind,source=$WLF_DIRECTORY,target=/etc/prometheus/ prom/prometheus
 }
 
 startGrafana(){
@@ -65,7 +65,7 @@ startGrafana(){
   echo '======================================='
   echo "STARTING GRAFANA"
   echo '======================================='
-  gnome-terminal --geometry=120x30 --window --title="Grafana" -- docker run --name=grafana --rm --network host grafana/grafana
+  gnome-terminal --geometry=140x35 --window --zoom=0.7 --title="Grafana" -- docker run --name=grafana --rm --network host grafana/grafana
 }
 
 downloadWildFly(){
@@ -115,6 +115,19 @@ downloadWildFly(){
   fi
 }
 
+deployToWildFly(){
+  cd distributed-webapp
+  mvn clean install
+  cd -
+  cp -f distributed-webapp/target/clusterbench-ee7-web.war $WLF_DIRECTORY/WFL1/standalone/deployments/
+  sleep 5
+  cp -f distributed-webapp/target/clusterbench-ee7-web.war $WLF_DIRECTORY/WFL2/standalone/deployments/
+  sleep 5
+  cp -f distributed-webapp/target/clusterbench-ee7-web.war $WLF_DIRECTORY/WFL3/standalone/deployments/
+  sleep 5
+  cp -f distributed-webapp/target/clusterbench-ee7-web.war $WLF_DIRECTORY/WFL4/standalone/deployments/
+  sleep 5
+}
 
 # ================
 # START
@@ -140,10 +153,12 @@ startWFL4 &
 sleep 5
 
 startPrometheus &
-sleep 15
+sleep 10
 
 startGrafana &
-sleep 15
+sleep 20
+
+deployToWildFly
 
 echo ''
 echo '======================================='
@@ -168,3 +183,36 @@ echo "Now access Grafana at 'http://localhost:3000/' with username 'admin' and p
 echo "Now access Prometheus at 'http://localhost:9090'"
 echo "---------------------------------------------------------------------------------------------"
 echo ''
+
+echo ''
+first_print=true
+while true; do
+  echo -n -e "\rSESSION DATA: "
+  curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8180/clusterbench-ee7-web/session
+  sleep 1
+  echo -n " "
+  curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8280/clusterbench-ee7-web/session
+  sleep 1
+  echo -n " "
+  curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8380/clusterbench-ee7-web/session
+  sleep 1
+  echo -n " "
+  curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8480/clusterbench-ee7-web/session
+  sleep 1
+  echo -n " "
+  curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8180/clusterbench-ee7-web/session
+  sleep 1
+  echo -n " "
+  curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8280/clusterbench-ee7-web/session
+  sleep 1
+  echo -n " "
+  curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8380/clusterbench-ee7-web/session
+  sleep 1
+  echo -n " "
+  curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8480/clusterbench-ee7-web/session
+  sleep 1
+  if [[ "$first_print" = true ]] ; then
+        echo -n -e "\t\t\t(press CTRL+C to exit)"
+        first_print=false
+  fi
+done

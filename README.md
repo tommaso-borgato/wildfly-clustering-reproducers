@@ -4,4 +4,4 @@ This repo contains some recipes and scripts on how to easily and quickly setup s
 
 ## METRICS
 
-Demonstrates hot to run a 4 nodes WildFly cluster producing metrics collected by Prometheus and visualized by Grafana.
+Demonstrates how to run a 4 nodes WildFly cluster producing metrics collected by Prometheus and visualized by Grafana.

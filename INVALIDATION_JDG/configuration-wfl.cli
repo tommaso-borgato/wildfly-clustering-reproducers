@@ -1,0 +1,20 @@
+embed-server --std-out=echo --server-config=standalone-ha.xml
+/subsystem=elytron/key-store=hotrod:add(type=JKS, path=/home/hudson/static_build_env/clustering/keystore/application.keystore, credential-reference={clear-text=password})
+/subsystem=elytron/key-manager=hotrod:add(credential-reference={clear-text=password},key-store=hotrod,algorithm=SunX509)
+/subsystem=elytron/trust-manager=hotrod:add(algorithm=SunX509, key-store=hotrod)
+/subsystem=elytron/client-ssl-context=hotrod:add(key-manager=hotrod,trust-manager=hotrod)
+/subsystem=infinispan/cache-container=web/replicated-cache=repl:add()
+/subsystem=infinispan/cache-container=web/replicated-cache=repl/component=locking:write-attribute(name=isolation, value=REPEATABLE_READ)
+/subsystem=infinispan/cache-container=web/replicated-cache=repl/component=transaction:write-attribute(name=mode, value=BATCH)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-jdg-server1:add(host=127.0.0.1, port=11522)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-jdg-server2:add(host=127.0.0.1, port=11622)
+batch
+/subsystem=infinispan/remote-cache-container=web-sessions:add(default-remote-cluster=jdg-server-cluster, protocol-version=2.9)
+/subsystem=infinispan/remote-cache-container=web-sessions/remote-cluster=jdg-server-cluster:add(socket-bindings=[remote-jdg-server1,remote-jdg-server2])
+/subsystem=infinispan/remote-cache-container=web-sessions/component=security:add(ssl-context=hotrod)
+run-batch
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload:add()
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=hotrod:add(remote-cache-container=web-sessions, fetch-state=false, preload=false, passivation=false, purge=false, shared=false)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=locking:add(isolation=REPEATABLE_READ)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=transaction:add(mode=BATCH)
+/subsystem=infinispan/cache-container=web:write-attribute(name=default-cache, value=offload)

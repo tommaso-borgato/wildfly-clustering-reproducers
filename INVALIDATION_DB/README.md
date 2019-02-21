@@ -13,8 +13,10 @@ Demonstrates how to run a 4 nodes WildFly cluster using an invalidation cache fo
   ```
   systemctl start docker
   ```
+- download WildFly (e.g. [wildfly-16.0.0.Beta1.zip](https://download.jboss.org/wildfly/16.0.0.Beta1/wildfly-16.0.0.Beta1.zip)) to some folder on your PC (e.g. `/some-folder/wildfly-16.0.0.Beta1.zip`)
 - run script:
   ```
+  export WLF_ZIP=/some-folder/wildfly-16.0.0.Beta1.zip
   start-all.sh --default
   ```
 - Connect to PostgreSQL at:

@@ -133,6 +133,7 @@ deployToWildFly(){
 # START
 # ================
 RED='\033[0;31m'
+GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 export WLF_DIRECTORY=/tmp/METRICS
 if [[ "x$WLF_ZIP_DOWNLOAD_URL" = "x" ]]; then
@@ -142,8 +143,9 @@ fi
 if [[ "x$WLF_ZIP" = "x" ]]; then
     export WLF_ZIP=$WLF_DIRECTORY/wildfly.zip
     echo -e "${RED}\nWARNING!\nEnvironment variable WLF_ZIP not set: default is $WLF_ZIP\n${NC}"
+else
+    echo -e "${GREEN}\nWARNING!\nUsing WildFly distribution $WLF_ZIP\n${NC}"
 fi
-export WLF_ZIP=$WLF_DIRECTORY/wildfly.zip
 
 mkdir -p $WLF_DIRECTORY
 cp -f prometheus.yml $WLF_DIRECTORY

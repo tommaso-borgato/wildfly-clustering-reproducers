@@ -2,3 +2,5 @@
 **/*.iml
 **/target/
 **/.idea/
+**/postgresql-connector.jar
+.idea/

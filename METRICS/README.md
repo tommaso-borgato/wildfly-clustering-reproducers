@@ -17,6 +17,7 @@ Steps (on Fedora):
   ```
 - run script:
   ```
+  export WLF_ZIP=/some-folder/wildfly.zip
   start-all.sh
   ```
 - visit Grafana console at url [Grafana Console](http://localhost:3000/) (use "usename/password" "admin/admin")

@@ -69,46 +69,47 @@ startGrafana(){
 }
 
 downloadWildFly(){
-  echo ''
-  echo '======================================='
-  echo "DOWNLOADING WILDFLY"
-  echo '======================================='
-  if [[ ! -f $WIDLFLY_ZIP ]] ; then
-    wget -O $WIDLFLY_ZIP https://download.jboss.org/wildfly/16.0.0.Beta1/wildfly-16.0.0.Beta1.zip
+  if [[ ! -f $WLF_ZIP ]] ; then
+    echo -e "${RED}\nWARNING!\nFile $WLF_ZIP does not exist: downloading $WLF_ZIP_DOWNLOAD_URL\n${NC}"
+    echo ''
+    echo '======================================='
+    echo "DOWNLOADING WILDFLY FROM $WLF_ZIP_DOWNLOAD_URL"
+    echo '======================================='
+    wget -O $WLF_ZIP $WLF_ZIP_DOWNLOAD_URL
   fi
-  echo ''
-  echo '======================================='
-  echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL1"
-  echo '======================================='
   if [[ ! -d "$WLF_DIRECTORY/WFL1" ]] ; then
-    unzip -d $WLF_DIRECTORY/tmp-wildfly $WIDLFLY_ZIP > /dev/null
+    echo ''
+    echo '======================================='
+    echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL1"
+    echo '======================================='
+    unzip -d $WLF_DIRECTORY/tmp-wildfly $WLF_ZIP > /dev/null
     mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFL1
     rm -fdr $WLF_DIRECTORY/tmp-wildfly
   fi
-  echo ''
-  echo '======================================='
-  echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL2"
-  echo '======================================='
   if [[ ! -d "$WLF_DIRECTORY/WFL2" ]] ; then
-    unzip -d $WLF_DIRECTORY/tmp-wildfly $WIDLFLY_ZIP > /dev/null
+    echo ''
+    echo '======================================='
+    echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL2"
+    echo '======================================='
+    unzip -d $WLF_DIRECTORY/tmp-wildfly $WLF_ZIP > /dev/null
     mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFL2
     rm -fdr $WLF_DIRECTORY/tmp-wildfly
   fi
-  echo ''
-  echo '======================================='
-  echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL3"
-  echo '======================================='
   if [[ ! -d "$WLF_DIRECTORY/WFL3" ]] ; then
-    unzip -d $WLF_DIRECTORY/tmp-wildfly $WIDLFLY_ZIP > /dev/null
+    echo ''
+    echo '======================================='
+    echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL3"
+    echo '======================================='
+    unzip -d $WLF_DIRECTORY/tmp-wildfly $WLF_ZIP > /dev/null
     mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFL3
     rm -fdr $WLF_DIRECTORY/tmp-wildfly
   fi
-  echo ''
-  echo '======================================='
-  echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL4"
-  echo '======================================='
   if [[ ! -d "$WLF_DIRECTORY/WFL4" ]] ; then
-    unzip -d $WLF_DIRECTORY/tmp-wildfly $WIDLFLY_ZIP > /dev/null
+    echo ''
+    echo '======================================='
+    echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL4"
+    echo '======================================='
+    unzip -d $WLF_DIRECTORY/tmp-wildfly $WLF_ZIP > /dev/null
     mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFL4
     rm -fdr $WLF_DIRECTORY/tmp-wildfly
   fi
@@ -131,9 +132,19 @@ deployToWildFly(){
 # ================
 # START
 # ================
-
-export WIDLFLY_ZIP=/tmp/METRICS/wildfly.zip
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 export WLF_DIRECTORY=/tmp/METRICS
+if [[ "x$WLF_ZIP_DOWNLOAD_URL" = "x" ]]; then
+    export WLF_ZIP_DOWNLOAD_URL=https://download.jboss.org/wildfly/16.0.0.Beta1/wildfly-16.0.0.Beta1.zip
+    echo -e "${RED}\nWARNING!\nEnvironment variable WLF_ZIP_DOWNLOAD_URL not set: default is $WLF_ZIP_DOWNLOAD_URL\n${NC}"
+fi
+if [[ "x$WLF_ZIP" = "x" ]]; then
+    export WLF_ZIP=$WLF_DIRECTORY/wildfly.zip
+    echo -e "${RED}\nWARNING!\nEnvironment variable WLF_ZIP not set: default is $WLF_ZIP\n${NC}"
+fi
+export WLF_ZIP=$WLF_DIRECTORY/wildfly.zip
+
 mkdir -p $WLF_DIRECTORY
 cp -f prometheus.yml $WLF_DIRECTORY
 

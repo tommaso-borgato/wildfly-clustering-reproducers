@@ -15,7 +15,7 @@ Demonstrates how to run a 4 nodes WildFly cluster using an invalidation cache fo
   ```
 - run script:
   ```
-  start-all.sh
+  start-all.sh --default
   ```
 - Connect to PostgreSQL at:
   ```
@@ -23,7 +23,109 @@ Demonstrates how to run a 4 nodes WildFly cluster using an invalidation cache fo
   username: postgres
   password: postgres
   ```
+  and run SQL query:
+  ```
+  select * from s_distributed_webapp_war
+  ```
 - run script:
   ```
   stop-all.sh
   ```    
+
+## Profiles
+
+You can run the reproducer with the following profiles:
+
+### default
+
+```
+start-all.sh --default
+```
+
+Using this profile we get a webapp configured to use cache `offload` in cache container `web`.
+
+
+### distributable-web-1
+
+```
+start-all.sh --distributable-web-1
+```
+
+Using this profile, the webapp is configured though file `WEB-INF/distributable-web.xml`:
+```xml
+<distributable-web xmlns="urn:jboss:distributable-web:1.0">
+  <session-management name="sm_offload_to_db_1"/>
+</distributable-web>
+```
+to use the `session-management` profile `sm_offload_to_db_1` defined in subsystem `distributable-web`:
+```xml
+<subsystem xmlns="urn:jboss:domain:distributable-web:1.0" default-session-management="default" default-single-sign-on-management="default">
+  ...
+  <infinispan-session-management name="sm_offload_to_db_1" granularity="SESSION" routing="OWNER" cache-container="web" cache="offload_to_db_1"/>
+  ...    
+</subsystem>
+```
+this `sm_offload_to_db_1` profile points to an existing cache `offload_to_db_1`:
+```xml
+<subsystem xmlns="urn:jboss:domain:infinispan:7.0">
+    <cache-container name="web" default-cache="dist" module="org.wildfly.clustering.web.infinispan">
+        <invalidation-cache name="offload_to_db_1">
+            <jdbc-store data-source="testDS" dialect="POSTGRES" fetch-state="false" passivation="false" purge="false" shared="true">
+                <table prefix="s">
+                    <id-column name="id" type="VARCHAR(255)"/>
+                    <data-column name="datum" type="BYTEA"/>
+                    <timestamp-column name="version" type="BIGINT"/>
+                </table>
+            </jdbc-store>
+        </invalidation-cache>
+        ...
+    </cache-container>
+</subsystem>
+```
+
+> Use SQL query:
+    ```
+    select * from s_distributed_webapp_distributable_web_1_war
+    ```
+
+### distributable-web-2
+
+```
+start-all.sh --distributable-web-2
+```
+
+Using this profile, the webapp is configured though file `WEB-INF/distributable-web.xml`:
+```xml
+<distributable-web xmlns="urn:jboss:distributable-web:1.0">
+    <infinispan-session-management cache-container="web" cache="offload_to_db_2" granularity="SESSION" routing="OWNER"/>
+</distributable-web>
+```
+to use existing cache `offload_to_db_2`:
+```xml
+<subsystem xmlns="urn:jboss:domain:infinispan:7.0">
+    <cache-container name="web" default-cache="dist" module="org.wildfly.clustering.web.infinispan">
+        <invalidation-cache name="offload_to_db_2">
+            <jdbc-store data-source="testDS" dialect="POSTGRES" fetch-state="false" passivation="false" purge="false" shared="true">
+                <table prefix="s">
+                    <id-column name="id" type="VARCHAR(255)"/>
+                    <data-column name="datum" type="BYTEA"/>
+                    <timestamp-column name="version" type="BIGINT"/>
+                </table>
+            </jdbc-store>
+        </invalidation-cache>
+    </cache-container>
+</subsystem>    
+```
+
+> Use SQL query:
+    ```
+    select * from s_distributed_webapp_distributable_web_2_war
+    ```
+
+
+
+
+
+
+
+

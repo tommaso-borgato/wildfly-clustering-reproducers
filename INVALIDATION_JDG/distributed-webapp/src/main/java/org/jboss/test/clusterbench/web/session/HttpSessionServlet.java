@@ -13,9 +13,6 @@ import java.util.logging.Logger;
 @WebServlet(name = "HttpSessionServlet", urlPatterns = {"/session"})
 public class HttpSessionServlet extends HttpServlet {
 
-    //@Resource(lookup = "java:jboss/infinispan/remote-container/web-sessions")
-    //private org.infinispan.client.hotrod.RemoteCacheContainer client;
-
     protected static final Logger log = Logger.getLogger(HttpSessionServlet.class.getName());
     public static final String KEY = HttpSessionServlet.class.getName();
 
@@ -60,37 +57,6 @@ public class HttpSessionServlet extends HttpServlet {
             log.log(Level.INFO, "Invalidating: {0}", session.getId());
             session.invalidate();
         }
-
-        // list HotRod cache elements
-        /*
-        try{
-            log.info("Try to get cache distributed-webapp.war");
-            BasicCache<String,Object> cache = client.getCache("distributed-webapp.war");
-            for (Map.Entry<String, Object> entry: cache.entrySet()) {
-                log.info(entry.getKey() + " -> " + entry.getValue());
-            }
-        } catch (Exception err){
-            log.log(Level.SEVERE,"HotRod error", err);
-        }
-        try {
-            log.info("Try to get cache distributed-webapp-distributable-web-1.war");
-            BasicCache<String,Object> cache1 = client.getCache("distributed-webapp-distributable-web-1.war");
-            for (Map.Entry<String, Object> entry: cache1.entrySet()) {
-                log.info(entry.getKey() + " -> " + entry.getValue());
-            }
-        } catch (Exception err){
-            log.log(Level.SEVERE,"HotRod error", err);
-        }
-        try {
-            log.info("Try to get cache distributed-webapp-distributable-web-2.war");
-            BasicCache<String,Object> cache2 = client.getCache("distributed-webapp-distributable-web-2.war");
-            for (Map.Entry<String, Object> entry: cache2.entrySet()) {
-                log.info(entry.getKey() + " -> " + entry.getValue());
-            }
-        } catch (Exception err){
-            log.log(Level.SEVERE,"HotRod error", err);
-        }
-        */
     }
 
     private Object createSerialBean(int cargokbytes) {

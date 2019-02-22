@@ -37,23 +37,6 @@
             <version>7.0</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.msc</groupId>
-            <artifactId>jboss-msc</artifactId>
-            <version>1.4.5.Final</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-core</artifactId>
-            <version>9.4.6.Final</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-client-hotrod</artifactId>
-            <version>9.4.5.Final</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -95,7 +78,8 @@
                                 </goals>
                                 <configuration>
                                     <classifier>distributable-web-1</classifier>
-                                    <warSourceDirectory>${basedir}/src/main/webapp-distributable-web-1</warSourceDirectory>
+                                    <warSourceDirectory>${basedir}/src/main/webapp-distributable-web-1
+                                    </warSourceDirectory>
                                 </configuration>
                             </execution>
                         </executions>
@@ -121,7 +105,8 @@
                                 </goals>
                                 <configuration>
                                     <classifier>distributable-web-2</classifier>
-                                    <warSourceDirectory>${basedir}/src/main/webapp-distributable-web-2</warSourceDirectory>
+                                    <warSourceDirectory>${basedir}/src/main/webapp-distributable-web-2
+                                    </warSourceDirectory>
                                 </configuration>
                             </execution>
                         </executions>

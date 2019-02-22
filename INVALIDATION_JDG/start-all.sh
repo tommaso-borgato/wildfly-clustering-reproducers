@@ -175,13 +175,13 @@ if [[ "x$WLF_ZIP" = "x" ]]; then
     export WLF_ZIP=$WLF_DIRECTORY/wildfly.zip
     echo -e "${RED}\nWARNING!\nEnvironment variable WLF_ZIP not set: default is $WLF_ZIP\n${NC}"
 else
-    echo -e "${GREEN}\n=======================================\nUsing WildFly distribution $WLF_ZIP\n=======================================\n${NC}"
+    echo -e "${GREEN}\n=======================================\nUsing WLF_ZIP $WLF_ZIP\n=======================================\n${NC}"
 fi
 if [[ "x$WLF_ZIP_DOWNLOAD_URL" = "x" ]]; then
     export WLF_ZIP_DOWNLOAD_URL=https://download.jboss.org/wildfly/16.0.0.Beta1/wildfly-16.0.0.Beta1.zip
     echo -e "${RED}\nWARNING!\nEnvironment variable WLF_ZIP_DOWNLOAD_URL not set: default is $WLF_ZIP_DOWNLOAD_URL\n${NC}"
   else
-      echo -e "${GREEN}\n=======================================\nUsing WildFly distribution from URL $WLF_ZIP_DOWNLOAD_URL\n=======================================\n${NC}"
+      echo -e "${GREEN}\n=======================================\nUsing WLF_ZIP_DOWNLOAD_URL $WLF_ZIP_DOWNLOAD_URL\n=======================================\n${NC}"
 fi
 
 # ========================
@@ -191,13 +191,13 @@ if [[ "x$JDG_ZIP" = "x" ]]; then
     export JDG_ZIP=$JDG_DIRECTORY/jboss-datagrid-server.zip
     echo -e "${RED}\nWARNING!\nEnvironment variable JDG_ZIP not set: default is $JDG_ZIP\n${NC}"
 else
-    echo -e "${GREEN}\n=======================================\nUsing JDG distribution $JDG_ZIP\n=======================================\n${NC}"
+    echo -e "${GREEN}\n=======================================\nUsing JDG_ZIP $JDG_ZIP\n=======================================\n${NC}"
 fi
 if [[ "x$JDG_ZIP_DOWNLOAD_URL" = "x" ]]; then
-    export JDG_ZIP_DOWNLOAD_URL=http://downloads.jboss.org/infinispan/9.3.5.Final/infinispan-server-9.3.5.Final.zip
+    export JDG_ZIP_DOWNLOAD_URL=http://downloads.jboss.org/infinispan/9.4.6.Final/infinispan-server-9.4.6.Final.zip
     echo -e "${RED}\nWARNING!\nEnvironment variable JDG_ZIP_DOWNLOAD_URL not set: default is $JDG_ZIP_DOWNLOAD_URL\n${NC}"
   else
-      echo -e "${GREEN}\n=======================================\nUsing JDG distribution from URL $JDG_ZIP_DOWNLOAD_URL\n=======================================\n${NC}"
+      echo -e "${GREEN}\n=======================================\nUsing JDG_ZIP_DOWNLOAD_URL $JDG_ZIP_DOWNLOAD_URL\n=======================================\n${NC}"
 fi
 
 # ========================

@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <distributable-web xmlns="urn:jboss:distributable-web:1.0">
-    <session-management name="sm_offload_to_db_1"/>
+    <session-management name="sm_offload_to_jdg_1"/>
 </distributable-web>

@@ -10,3 +10,5 @@ run-batch
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=locking:add(isolation=REPEATABLE_READ)
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=transaction:add(mode=BATCH)
 /subsystem=infinispan/cache-container=web:write-attribute(name=default-cache,value=offload)
+/subsystem=distributable-web/infinispan-session-management=sm_offload_to_jdg_1:add(cache-container=web,cache=offload,granularity=SESSION,routing=OWNER)
+run-batch

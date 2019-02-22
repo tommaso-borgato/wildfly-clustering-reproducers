@@ -4,7 +4,3 @@ Demonstrates how to run a 2 nodes WildFly cluster using an invalidation cache fo
 
 > NOTE: You need to use Java 8; Java 11 does not work with this Infinispan Server version
 
-
-/subsystem=datagrid-infinispan/cache-container=clustered/distributed-cache=distributed-webapp.war:add(configuration=default)
-/subsystem=datagrid-infinispan/cache-container=clustered/distributed-cache=distributed-webapp-distributable-web-1.war:add(configuration=default)
-/subsystem=datagrid-infinispan/cache-container=clustered/distributed-cache=distributed-webapp-distributable-web-2.war:add(configuration=default)

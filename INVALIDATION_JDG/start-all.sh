@@ -32,23 +32,30 @@ startJDG2(){
   gnome-terminal --geometry=140x35 --window --zoom=0.7 --working-directory=$WLF_DIRECTORY/JDG2 --title="JDG2" -- $WLF_DIRECTORY/JDG2/bin/standalone.sh --server-config=clustered.xml -Dprogram.name=JDG2 -Djboss.node.name=JDG2 -Djboss.socket.binding.port-offset=400
 }
 
-addUsers(){
+addUsersJdg(){
   echo ''
   echo '======================================='
-  echo 'ADDING USERS TO WILDFLY AND JDG'
+  echo 'ADDING USERS TO WILDFLY'
+  echo '======================================='
+  $WLF_DIRECTORY/JDG1/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
+  $WLF_DIRECTORY/JDG2/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
+  $WLF_DIRECTORY/JDG1/bin/add-user.sh -u admin -p admin123+
+  $WLF_DIRECTORY/JDG2/bin/add-user.sh -u admin -p admin123+
+  $WLF_DIRECTORY/JDG1/bin/add-user.sh -a -u ejb -p test
+  $WLF_DIRECTORY/JDG2/bin/add-user.sh -a -u ejb -p test
+}
+
+addUsersWildFly(){
+  echo ''
+  echo '======================================='
+  echo 'ADDING USERS TO JDG'
   echo '======================================='
   $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
   $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
-  $WLF_DIRECTORY/JDG1/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
-  $WLF_DIRECTORY/JDG2/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
   $WLF_DIRECTORY/WFL1/bin/add-user.sh -u admin -p admin123+
   $WLF_DIRECTORY/WFL2/bin/add-user.sh -u admin -p admin123+
-  $WLF_DIRECTORY/JDG1/bin/add-user.sh -u admin -p admin123+
-  $WLF_DIRECTORY/JDG2/bin/add-user.sh -u admin -p admin123+
   $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u ejb -p test
   $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u ejb -p test
-  $WLF_DIRECTORY/JDG1/bin/add-user.sh -a -u ejb -p test
-  $WLF_DIRECTORY/JDG2/bin/add-user.sh -a -u ejb -p test
 }
 
 downloadJdg() {
@@ -66,7 +73,7 @@ downloadJdg() {
     echo "UNZIP JDG to $JDG_DIRECTORY/JDG1"
     echo '======================================='
     unzip -d $JDG_DIRECTORY/tmp-jdg $JDG_ZIP > /dev/null
-    mv $JDG_DIRECTORY/tmp-jdg/*-server-* $JDG_DIRECTORY/JDG1
+    mv $JDG_DIRECTORY/tmp-jdg/*-server* $JDG_DIRECTORY/JDG1
     rm -fdr $JDG_DIRECTORY/tmp-jdg
   fi
   if [[ ! -d "$JDG_DIRECTORY/JDG2" ]] ; then
@@ -75,7 +82,7 @@ downloadJdg() {
     echo "UNZIP JDG to $JDG_DIRECTORY/JDG2"
     echo '======================================='
     unzip -d $JDG_DIRECTORY/tmp-jdg $JDG_ZIP > /dev/null
-    mv $JDG_DIRECTORY/tmp-jdg/*-server-* $JDG_DIRECTORY/JDG2
+    mv $JDG_DIRECTORY/tmp-jdg/*-server* $JDG_DIRECTORY/JDG2
     rm -fdr $JDG_DIRECTORY/tmp-jdg
   fi
 }
@@ -139,9 +146,9 @@ deployToWildFly(){
   cd distributed-webapp
   mvn $MVN_PROFILE clean install
   cd -
-  cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/
+  cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/
   sleep 5
-  cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/
+  cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/
   sleep 5
 }
 
@@ -168,11 +175,13 @@ if [[ "x$WLF_ZIP" = "x" ]]; then
     export WLF_ZIP=$WLF_DIRECTORY/wildfly.zip
     echo -e "${RED}\nWARNING!\nEnvironment variable WLF_ZIP not set: default is $WLF_ZIP\n${NC}"
 else
-    echo -e "${GREEN}\nWARNING!\nUsing WildFly distribution $WLF_ZIP\n${NC}"
+    echo -e "${GREEN}\n=======================================\nUsing WildFly distribution $WLF_ZIP\n=======================================\n${NC}"
 fi
 if [[ "x$WLF_ZIP_DOWNLOAD_URL" = "x" ]]; then
     export WLF_ZIP_DOWNLOAD_URL=https://download.jboss.org/wildfly/16.0.0.Beta1/wildfly-16.0.0.Beta1.zip
     echo -e "${RED}\nWARNING!\nEnvironment variable WLF_ZIP_DOWNLOAD_URL not set: default is $WLF_ZIP_DOWNLOAD_URL\n${NC}"
+  else
+      echo -e "${GREEN}\n=======================================\nUsing WildFly distribution from URL $WLF_ZIP_DOWNLOAD_URL\n=======================================\n${NC}"
 fi
 
 # ========================
@@ -182,24 +191,26 @@ if [[ "x$JDG_ZIP" = "x" ]]; then
     export JDG_ZIP=$JDG_DIRECTORY/jboss-datagrid-server.zip
     echo -e "${RED}\nWARNING!\nEnvironment variable JDG_ZIP not set: default is $JDG_ZIP\n${NC}"
 else
-    echo -e "${GREEN}\nWARNING!\nUsing JDG distribution $JDG_ZIP\n${NC}"
+    echo -e "${GREEN}\n=======================================\nUsing JDG distribution $JDG_ZIP\n=======================================\n${NC}"
 fi
 if [[ "x$JDG_ZIP_DOWNLOAD_URL" = "x" ]]; then
-    export JDG_ZIP_DOWNLOAD_URL=http://downloads.jboss.org/infinispan/9.4.6.Final/infinispan-server-9.4.6.Final.zip
+    export JDG_ZIP_DOWNLOAD_URL=http://downloads.jboss.org/infinispan/9.3.5.Final/infinispan-server-9.3.5.Final.zip
     echo -e "${RED}\nWARNING!\nEnvironment variable JDG_ZIP_DOWNLOAD_URL not set: default is $JDG_ZIP_DOWNLOAD_URL\n${NC}"
+  else
+      echo -e "${GREEN}\n=======================================\nUsing JDG distribution from URL $JDG_ZIP_DOWNLOAD_URL\n=======================================\n${NC}"
 fi
 
 # ========================
 # Profile
 # ========================
 if [[ "x$1" = "x--distributable-web-1" ]]; then
-    export WLF_CLI_SCRIPT=configuration-distributable-web-1.cli
+    export WLF_CLI_SCRIPT=configuration-wfl-distributable-web-1.cli
     export MVN_PROFILE="-q -P distributable-web-1"
     export WAR_FINAL_NAME=distributed-webapp-distributable-web-1.war
     export WAR_CONTEXT_PATH=distributed-webapp-distributable-web-1
     export JDG_CLI_SCRIPT=configuration-jdg.cli
 elif [[ "x$1" = "x--distributable-web-2" ]]; then
-    export WLF_CLI_SCRIPT=configuration-distributable-web-2.cli
+    export WLF_CLI_SCRIPT=configuration-wfl-distributable-web-2.cli
     export MVN_PROFILE="-q -P distributable-web-2"
     export WAR_FINAL_NAME=distributed-webapp-distributable-web-2.war
     export WAR_CONTEXT_PATH=distributed-webapp-distributable-web-2
@@ -213,6 +224,7 @@ elif [[ "x$1" = "x--default" ]]; then
 else
     exitWithMsg "Invalid first argument"
 fi
+echo -e "${GREEN}\n=======================================\nUsing WLF_CLI_SCRIPT $WLF_CLI_SCRIPT\nUsing WAR_FINAL_NAME $WAR_FINAL_NAME\nUsing WAR_CONTEXT_PATH $WAR_CONTEXT_PATH\nUsing JDG_CLI_SCRIPT $JDG_CLI_SCRIPT\n=======================================\n${NC}"
 
 mkdir -p $WLF_DIRECTORY
 
@@ -228,34 +240,40 @@ rm -f /tmp/cookies1
 rm -f /tmp/cookies2
 rm -f /tmp/cookies3
 rm -f /tmp/cookies4
-sleep 3
+sleep 1
 
 downloadJdg
-sleep 3
+sleep 1
 
 downloadWildFly
-sleep 3
+sleep 1
 
-addUsers
+addUsersJdg
+sleep 1
+
+addUsersWildFly
+sleep 1
 
 configureJdg
+sleep 1
 
 configureWildFly
+sleep 1
 
 startJDG1
 sleep 5
 
 startJDG2
-sleep 15
+sleep 20
 
 startWFL1
 sleep 5
 
 startWFL2
-sleep 5
+sleep 25
 
 deployToWildFly
-sleep 5
+sleep 15
 
 echo ''
 first_print=true
@@ -289,4 +307,3 @@ while true; do
         first_print=false
   fi
 done
-

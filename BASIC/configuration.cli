@@ -1,0 +1,5 @@
+embed-server --std-out=echo --server-config=standalone-ha.xml
+/subsystem=infinispan/cache-container=web/distributed-cache=testDist:add()
+/subsystem=infinispan/cache-container=web/distributed-cache=testDist/component=locking:write-attribute(name=isolation, value=REPEATABLE_READ)
+/subsystem=infinispan/cache-container=web/distributed-cache=testDist/component=transaction:write-attribute(name=mode, value=BATCH)
+/subsystem=infinispan/cache-container=web:write-attribute(name=default-cache, value=testDist)

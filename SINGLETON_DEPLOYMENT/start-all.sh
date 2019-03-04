@@ -101,7 +101,7 @@ downloadWildFly(){
 configureWildFly(){
   echo ''
   echo '======================================='
-  echo "CONFIGURE WILDFLY"
+  echo "CONFIGURE WILDFLY WITH $WLF_CLI_SCRIPT"
   echo '======================================='
   $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT
   sleep 2
@@ -119,6 +119,7 @@ deployToWildFly(){
   echo "DEPLOY TO WILDFLY"
   echo '======================================='
   cd distributed-webapp
+  echo "mvn $MVN_PROFILE clean install"
   mvn $MVN_PROFILE clean install
   cd -
   cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/
@@ -132,8 +133,9 @@ deployToWildFly(){
 }
 
 exitWithMsg(){
-    echo "$1"
-    echo "e.g.: $0 "
+    echo -e "${RED}ERROR: $1 !${NC}"
+    echo -e "${GREEN}e.g.: $0 --election-policy [quorum|random|preferences] --descriptor [jboss-all|singleton-deployment]${NC}"
+    echo -e "${GREEN}NOTE: set environment variable WLF_ZIP=/path/wildfly.zip${NC}"
     exit -1
 }
 
@@ -144,11 +146,8 @@ exitWithMsg(){
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
-export WLF_CLI_SCRIPT=configuration.cli
 export MVN_PROFILE="-q"
-export WAR_FINAL_NAME=distributed-webapp.war
-export WAR_CONTEXT_PATH=distributed-webapp
-export WLF_DIRECTORY=/tmp/BASIC
+export WLF_DIRECTORY=/tmp/SINGLETON_DEPLOYMENT
 
 if [[ "x$WLF_ZIP" = "x" ]]; then
     export WLF_ZIP=$WLF_DIRECTORY/wildfly.zip
@@ -159,6 +158,41 @@ fi
 if [[ "x$WLF_ZIP_DOWNLOAD_URL" = "x" ]]; then
     export WLF_ZIP_DOWNLOAD_URL=https://download.jboss.org/wildfly/16.0.0.Beta1/wildfly-16.0.0.Beta1.zip
     echo -e "${RED}\nWARNING!\nEnvironment variable WLF_ZIP_DOWNLOAD_URL not set: default is $WLF_ZIP_DOWNLOAD_URL\n${NC}"
+fi
+
+# ========================
+# Profile
+# ========================
+if [[ "x$1" = "x--election-policy" ]]; then
+    echo "election policy: $2"
+    if [[ "x$2" = "xquorum" ]]; then
+        export WLF_CLI_SCRIPT=configuration-wfl-quorum.cli
+    elif [[ "x$2" = "xrandom" ]]; then
+        export WLF_CLI_SCRIPT=configuration-wfl-random.cli
+    elif [[ "x$2" = "xpreferences" ]]; then
+        export WLF_CLI_SCRIPT=configuration-wfl-preferences.cli
+    else
+        exitWithMsg "Invalid second argument"
+    fi
+else
+    exitWithMsg "Invalid first argument"
+fi
+
+if [[ "x$3" = "x--descriptor" ]]; then
+    echo "deployment descriptor: $4.xml"
+    if [[ "x$4" = "xjboss-all" ]]; then
+        export MVN_PROFILE="-q -P jboss-all"
+        export WAR_FINAL_NAME=distributed-webapp.war
+        export WAR_CONTEXT_PATH=distributed-webapp
+    elif [[ "x$4" = "xsingleton-deployment" ]]; then
+        export MVN_PROFILE="-q -P singleton-deployment"
+        export WAR_FINAL_NAME=distributed-webapp.war
+        export WAR_CONTEXT_PATH=distributed-webapp
+    else
+        exitWithMsg "Invalid fourth argument"
+    fi
+else
+    exitWithMsg "Invalid third argument"
 fi
 
 mkdir -p $WLF_DIRECTORY
@@ -202,30 +236,24 @@ sleep 5
 echo ''
 first_print=true
 while true; do
+  for WFL_PORT in 8180 8280 8380 8480
+  do
+    wget -q --spider http://localhost:$WFL_PORT/$WAR_CONTEXT_PATH/
+    RETVAL=$?
+    if [[ $RETVAL -ne 0 ]]; then
+        echo -e "${RED}SERVICE DOWN ON http://localhost:$WFL_PORT/$WAR_CONTEXT_PATH/${NC}"
+    else
+        echo -e "${GREEN}SERVICE UP ON http://localhost:$WFL_PORT/$WAR_CONTEXT_PATH/${NC}"
+        export WFL_ACTIVE_NODE=http://localhost:$WFL_PORT/$WAR_CONTEXT_PATH/session
+    fi
+    sleep 1
+  done
+
   echo -n -e "\rSESSION DATA: "
-  curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8180/$WAR_CONTEXT_PATH/session
+  curl -b /tmp/cookies1 -c /tmp/cookies1 $WFL_ACTIVE_NODE
+  echo ""
   sleep 1
-  echo -n " "
-  curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8280/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8380/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8480/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8180/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8280/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8380/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8480/$WAR_CONTEXT_PATH/session
-  sleep 1
+
   if [[ "$first_print" = true ]] ; then
         echo -n -e "\t\t\t(press CTRL+C to exit)"
         first_print=false

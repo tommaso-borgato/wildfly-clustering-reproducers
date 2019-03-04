@@ -1,0 +1,4 @@
+embed-server --server-config=standalone-ha.xml
+/subsystem=singleton/singleton-policy=default/election-policy=random:add()
+/subsystem=jgroups:write-attribute(name=default-stack,value=tcp)
+/subsystem=jgroups/channel=ee:write-attribute(name=stack,value=tcp)

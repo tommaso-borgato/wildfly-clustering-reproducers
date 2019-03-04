@@ -1,0 +1,4 @@
+embed-server --server-config=standalone-ha.xml
+/subsystem=singleton/singleton-policy=default:write-attribute(name=quorum,value=3)
+/subsystem=jgroups:write-attribute(name=default-stack,value=tcp)
+/subsystem=jgroups/channel=ee:write-attribute(name=stack,value=tcp)

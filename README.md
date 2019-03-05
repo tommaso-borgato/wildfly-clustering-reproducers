@@ -23,3 +23,8 @@ Demonstrates how to run a 2 nodes WildFly cluster using an invalidation cache fo
 
 Demonstrates how to run a Singleton Deployment WAR on a 4 nodes WildFly cluster;
 a Singleton Deployment WAR is deployed to the 4 nodes and some HTTP requests are fired at the 4 nodes to check the service is active on just on node;
+
+## SHARED SESSIONS
+
+Demonstrates how to run an EAR containing 2 WAR files sharing HTTP sessions, on a 4 nodes WildFly cluster;
+Some HTTP requests are fired at the 4 nodes to check that session are shared across WAR files and nodes;

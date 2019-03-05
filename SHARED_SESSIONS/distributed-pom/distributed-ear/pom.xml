@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>distributed-pom</artifactId>
+        <groupId>org.jboss.test</groupId>
+        <version>3.0.0.Alpha1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>distributed-ear</artifactId>
+    <packaging>ear</packaging>
+
+    <dependencies>
+        <!-- EE API -->
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>8.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>distributed-webapp</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common-jar</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <version>8</version>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <modules>
+                        <jarModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>common-jar</artifactId>
+                        </jarModule>
+                        <webModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>distributed-webapp</artifactId>
+                            <bundleFileName>distributed-webapp-1.war</bundleFileName>
+                            <contextRoot>/clusterbench1</contextRoot>
+                        </webModule>
+                        <webModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>distributed-webapp</artifactId>
+                            <bundleFileName>distributed-webapp-2.war</bundleFileName>
+                            <contextRoot>/clusterbench2</contextRoot>
+                        </webModule>
+                    </modules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

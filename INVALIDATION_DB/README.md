@@ -2,10 +2,14 @@
 
 Demonstrates how to run a 4 nodes WildFly cluster using an invalidation cache for webapps backed by a relational Database.
 
-> NOTE: You need to use WildFly built from `https://github.com/pferraro/wildfly/` branch `refs/heads/web`
+Relational Database is PostgreSQL and is started as Docker container.
+
+> NOTE: Profiles `distributable-web-1` and `distributable-web-2` were added to test [EAP7-1072](https://issues.jboss.org/browse/EAP7-1072)
+
+> NOTE: If you want to use profiles `distributable-web-1` and `distributable-web-2` (before [EAP7-1072](https://issues.jboss.org/browse/EAP7-1072) is merged), you need to use WildFly built from `https://github.com/pferraro/wildfly/` branch `refs/heads/web` 
 
 - install [Docker](https://docs.docker.com/install/linux/docker-ce/fedora/)
-- install `gnome-terminal`:
+- install `gnome-terminal` (used to see log from different nodes in different terminal windows):
   ```
   sudo yum install gnome-terminal
   ```
@@ -13,10 +17,10 @@ Demonstrates how to run a 4 nodes WildFly cluster using an invalidation cache fo
   ```
   systemctl start docker
   ```
-- download WildFly (e.g. [wildfly-16.0.0.Beta1.zip](https://download.jboss.org/wildfly/16.0.0.Beta1/wildfly-16.0.0.Beta1.zip)) to some folder on your PC (e.g. `/some-folder/wildfly-16.0.0.Beta1.zip`)
+- download WildFly (e.g. [wildfly-16.0.0.Final.zip](https://download.jboss.org/wildfly/16.0.0.Beta1/wildfly-16.0.0.Final.zip)) to some folder on your PC (e.g. `/some-folder/wildfly-16.0.0.Final.zip`)
 - run script:
   ```
-  export WLF_ZIP=/some-folder/wildfly-16.0.0.Beta1.zip
+  export WLF_ZIP=/some-folder/wildfly-16.0.0.Final.zip
   start-all.sh --default
   ```
 - Connect to PostgreSQL at:
@@ -44,7 +48,8 @@ You can run the reproducer with the following profiles:
 start-all.sh --default
 ```
 
-Using this profile we get a webapp configured to use cache `offload` in cache container `web`.
+Using this profile we get a webapp configured to use a cache named `offload` in cache container `web`; 
+this `offload` cache stores session data in a PostgreSQL Database.
 
 
 ### distributable-web-1
@@ -63,7 +68,9 @@ to use the `session-management` profile `sm_offload_to_db_1` defined in subsyste
 ```xml
 <subsystem xmlns="urn:jboss:domain:distributable-web:1.0" default-session-management="default" default-single-sign-on-management="default">
   ...
-  <infinispan-session-management name="sm_offload_to_db_1" granularity="SESSION" routing="OWNER" cache-container="web" cache="offload_to_db_1"/>
+  <infinispan-session-management name="sm_offload_to_db_1" granularity="SESSION" cache-container="web" cache="offload_to_db_1">
+      <primary-owner-affinity/>
+  </infinispan-session-management>
   ...    
 </subsystem>
 ```
@@ -99,7 +106,9 @@ start-all.sh --distributable-web-2
 Using this profile, the webapp is configured though file `WEB-INF/distributable-web.xml`:
 ```xml
 <distributable-web xmlns="urn:jboss:distributable-web:1.0">
-    <infinispan-session-management cache-container="web" cache="offload_to_db_2" granularity="SESSION" routing="OWNER"/>
+    <infinispan-session-management cache-container="web" cache="offload_to_db_2" granularity="SESSION">
+        <primary-owner-affinity/>
+    </infinispan-session-management>
 </distributable-web>
 ```
 to use existing cache `offload_to_db_2`:

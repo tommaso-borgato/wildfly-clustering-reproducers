@@ -9,4 +9,3 @@ run-batch
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=hotrod:add(remote-cache-container=web-sessions, fetch-state=false, preload=false, passivation=false, purge=false, shared=false)
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=locking:add(isolation=REPEATABLE_READ)
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=transaction:add(mode=BATCH)
-/subsystem=infinispan/cache-container=web:write-attribute(name=default-cache,value=offload)

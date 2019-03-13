@@ -11,4 +11,5 @@ data-source add --name=testDS --jndi-name=java:jboss/datasources/testDS --driver
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload_to_db_1/store=jdbc/table=string:write-attribute(name=data-column.type,value=BYTEA)
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload_to_db_1/store=jdbc/table=string:write-attribute(name=timestamp-column.name,value=version)
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload_to_db_1/store=jdbc/table=string:write-attribute(name=timestamp-column.type,value=BIGINT)
-/subsystem=distributable-web/infinispan-session-management=sm_offload_to_db_1:add(cache-container=web,cache=offload_to_db_1,granularity=SESSION,routing=OWNER)
+/subsystem=distributable-web/infinispan-session-management=sm_offload_to_db_1:add(cache-container=web,cache=offload_to_db_1,granularity=SESSION)
+/subsystem=distributable-web/infinispan-session-management=sm_offload_to_db_1/affinity=primary-owner:add()

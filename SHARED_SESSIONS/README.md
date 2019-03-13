@@ -5,16 +5,11 @@ Some HTTP requests are fired at the 4 nodes to check that session are shared acr
 
 > NOTE: was tested with Java 11 and WildFly 16
 
-- install [Docker](https://docs.docker.com/install/linux/docker-ce/fedora/)
 - install `gnome-terminal`:
   ```
   sudo yum install gnome-terminal
   ```
-- start Docker with command:
-  ```
-  systemctl start docker
-  ```
-- download WildFly (e.g. [wildfly-16.0.0.Final.zip](https://download.jboss.org/wildfly/16.0.0.Final/wildfly-16.0.0.Final.zip)) to some folder on your PC (e.g. `/some-folder/wildfly-16.0.0.Beta1.zip`)
+- download WildFly (e.g. [wildfly-16.0.0.Final.zip](https://download.jboss.org/wildfly/16.0.0.Final/wildfly-16.0.0.Final.zip)) to some folder on your PC (e.g. `/some-folder/wildfly-16.0.0.Final.zip`)
 - run script:
   ```
   export WLF_ZIP=/some-folder/wildfly-16.0.0.Final.zip

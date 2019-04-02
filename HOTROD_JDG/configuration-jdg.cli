@@ -1,0 +1,5 @@
+embed-server --std-out=echo --server-config=clustered.xml
+/subsystem=logging/console-handler=CONSOLE:write-attribute(name=level,value=TRACE)
+/subsystem=logging/logger=org.infinispan.container.EntryFactoryImpl:add(category=org.infinispan.container.EntryFactoryImpl,level=TRACE)
+/subsystem=logging/logger=org.infinispan.container.EntryFactoryImpl:add-handler(name=CONSOLE)
+

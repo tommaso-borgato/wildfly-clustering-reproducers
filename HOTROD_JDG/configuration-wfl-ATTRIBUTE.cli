@@ -7,5 +7,5 @@ batch
 /subsystem=infinispan/remote-cache-container=datagrid-cc/near-cache=invalidation:add(max-entries=1000)
 # http://wildscribe.github.io/WildFly/16.0/subsystem/infinispan/remote-cache-container/near-cache/invalidation/index.html
 run-batch
-/subsystem=distributable-web/hotrod-session-management=datagrid-sm:add(remote-cache-container=datagrid-cc, granularity=ATTRIBUTE, routing=LOCAL)
-
+/subsystem=distributable-web/hotrod-session-management=datagrid-sm:add(remote-cache-container=datagrid-cc, granularity=ATTRIBUTE)
+/subsystem=distributable-web/hotrod-session-management=datagrid-sm/affinity=local:add()

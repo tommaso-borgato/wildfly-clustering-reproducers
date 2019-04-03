@@ -36,15 +36,19 @@ public class CommonHttpSessionServlet extends HttpServlet {
 
         if (session.isNew()) {
             if (req.getParameter(ClusterBenchConstants.CARGOKB) != null && req.getParameter(ClusterBenchConstants.CARGOKB).matches("[0-9]+")) {
-                log.log(Level.INFO, "New session created: {0} with {1}kB cargo", new Object[]{session.getId(), req.getParameter(ClusterBenchConstants.CARGOKB)});
+                log.log(Level.INFO,
+                        "\n==========================================================\nNew session created ID: {0} with {1}kB cargo\n==========================================================\n",
+                        new Object[]{session.getId(), req.getParameter(ClusterBenchConstants.CARGOKB)});
                 int kargokb = Integer.parseInt(req.getParameter(ClusterBenchConstants.CARGOKB));
                 session.setAttribute(KEY, this.createSerialBean(kargokb));
             } else {
-                log.log(Level.INFO, "New session created: {0} with {1}kB cargo", new Object[]{session.getId(), SerialBean.DEFAULT_CARGOKB});
+                log.log(Level.INFO,
+                        "\n==========================================================\nNew session created ID: {0} with {1}kB cargo\n==========================================================\n",
+                        new Object[]{session.getId(), SerialBean.DEFAULT_CARGOKB});
                 session.setAttribute(KEY, this.createSerialBean());
             }
         } else if (session.getAttribute(KEY) == null) {
-            log.log(Level.INFO, "Session is not new, creating SerialBean: {0}", session.getId());
+            log.log(Level.WARNING, "Session is not new but there is no session data: creating SerialBean: {0}", session.getId());
             session.setAttribute(KEY, this.createSerialBean());
         }
 
@@ -60,6 +64,7 @@ public class CommonHttpSessionServlet extends HttpServlet {
 
         int serial = bean.getSerial();
         bean.setSerial(serial + 1);
+        log.log(Level.INFO, "Session {0}: incrementing serial from {1} to {2}", new Object[]{session.getId(), serial, (serial + 1)});
 
         // Now store bean in the session
         session.setAttribute(KEY, bean);

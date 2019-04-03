@@ -1,12 +1,58 @@
-# INVALIDATION CACHE BACKED BY INFINISPAN SERVER (OR JDG)
+# HOTROD SESSION MANAGEMENT
 
 Demonstrates how to run a 2 nodes WildFly cluster using an remote cache for webapps, backed by a 2 nodes Infinispan Server cluster.
+The peculiarity of this configuration is that a particular HotRod session manager is used.
+This HotRod session manager talks directly to the Infinispan Server cluster through HotRod client.
 
-The cache used by WildFly distributable web apps is totally handled by a remote JDG cluster.
+The cache used by WildFly distributable web app is totally handled by a remote JDG cluster.
 
-Each WildFly node just holds an `invalidation-near-cache` which holds a copy of the entries and receives invalidation messages directly from the Infinispan Server cluster.
+You have two options here:
+
+1. L1 cache: maintain a copy of the entries in the remote JDG cluster, in `invalidation-near-cache` in every WildFly node: the so called L1 cache
+2. NO L1 cache
+
+> NOTE: Option "2. NO L1 cache" is NOT recommended and, hence, is not tested
+
+## L1 cache
+
+Each WildFly node have an `invalidation-near-cache` which holds a copy of the cache entries and receives invalidation messages directly from the Infinispan Server cluster.
 
 Instead, in a traditional configuration (like in reproducer `INVALIDATION_JDG`), invalidation messages are exchanged between WildFly nodes.
+
+### Transactional
+
+You have two options with L1 cache:
+
+1. Transactional L1 cache
+2. NON Transactional L1 cache
+
+> NOTE: Option "2. NON Transactional L1 cache" is NOT recommended and, hence, is not tested
+
+### Granularity
+
+You have two options with L1 cache:
+
+1. SESSION or "coarse" granularity
+2. ATTRIBUTE or "fine" granularity
+
+### Affinity
+
+When using L1 cache with HotRod session manager it is recommended to use sticky session; this translates to setting routing=LOCAL for the HotRod session manager:
+
+```
+```
+
+THis ensures that requests to the Infinispan Server cluster are always directed ("routed") to the node that last handled a request for a given session.
+
+## TESTS
+
+Given the above, Clustering tests are going to cover the following scenarios:
+
+1. L1 Transactional cache with SESSION granularity and sticky sessions
+2. L1 Transactional cache with ATTRIBUTE granularity and sticky sessions
+
+
+## Setup
 
 > NOTE: You need to use Java 8; Java 11 does not work with this Infinispan Server version
 > NOTE: You have to use WildFly 16 and infinispan-server-9.4.6 or (better) jboss-datagrid-7.3.0
@@ -33,79 +79,32 @@ Instead, in a traditional configuration (like in reproducer `INVALIDATION_JDG`),
   stop-all.sh
   ```    
 
-## Profiles
+## Detailed setup explanation
 
-You can run the reproducer with the following profiles:
+From the point of view of what we run, we have:
 
-### coarse
+- 2 Infinispan Server nodes forming a cluster (first node on port 11522, second node on port 11622)
+- 2 WildFly nodes forming a cluster (first node on port 8180, second node on port 8280)
 
-Uses granularity="SESSION" for cache data replication; run with command:
+> NOTE: we use e.g. `-Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100` to run multiple "WildFly" / "Infinispan Server" instances on the same host
 
-```
-start-all.sh --coarse
-```
+Each WildFly node is connected to the remote Infinispan Server cluster as follows:
 
-Uses file META-INF/jboss-all.xml in WAR to set:
-
-```xml
-<jboss xmlns="urn:jboss:1.0">
-    <distributable-web xmlns="urn:jboss:distributable-web:1.0">
-        <hotrod-session-management remote-cache-container="web" granularity="SESSION">
-            <local-affinity/>
-        </hotrod-session-management>
-    </distributable-web>
-</jboss>
-```
-
-to reference `remote-cache-container` in `standalone-ha.xml`:
-
-
-the infinispan-server-1 and infinispan-server-1 point 
-```xml
-<socket-binding-group name="standard-sockets" ... >
-    ...
-    <outbound-socket-binding name="infinispan-server-1">
-        <remote-destination host="127.0.0.1" port="11522"/>
-    </outbound-socket-binding>
-    <outbound-socket-binding name="infinispan-server-2">
-        <remote-destination host="127.0.0.1" port="11622"/>
-    </outbound-socket-binding>
-</socket-binding-group>
-```
-
-
-
-### fine
-
-Uses granularity="ATTRIBUTE" for cache data replication; run with command:
+On each WildFly node we create socket connections to the remote Infinispan Server cluster; in standalone-ha.xml we have:
 
 ```
-start-all.sh --coarse
+<outbound-socket-binding name="infinispan-server-1">
+            <remote-destination host="127.0.0.1" port="11522"/>
+</outbound-socket-binding>
+<outbound-socket-binding name="infinispan-server-2">
+    <remote-destination host="127.0.0.1" port="11622"/>
+</outbound-socket-binding>
 ```
 
-Uses file `META-INF/jboss-all.xml` in `WAR` to set:
+Then, on each WildFly node, we use these sockets to enable the WildFly Infinispan subsystem to connect to the remote Infinispan Server cluster:
 
-```xml
-<jboss xmlns="urn:jboss:1.0">
-    <distributable-web xmlns="urn:jboss:distributable-web:1.0">
-        <hotrod-session-management remote-cache-container="web" granularity="ATTRIBUTE">
-           <local-affinity/>
-       </hotrod-session-management>
-    </distributable-web>
-</jboss>
 ```
-
-to reference `remote-cache-container` in `standalone-ha.xml`:
-
-```xml
-TODO: add xml
-```
-
-
-L1 Cache in the Infinispan subsystem:
-
-```xml
-<remote-cache-container name="web" default-remote-cluster="infinispan-server-cluster" module="org.wildfly.clustering.web.hotrod">
+<remote-cache-container name="datagrid-cc" default-remote-cluster="infinispan-server-cluster" module="org.wildfly.clustering.web.hotrod">
     <invalidation-near-cache max-entries="1000"/>
     <remote-clusters>
         <remote-cluster name="infinispan-server-cluster" socket-bindings="infinispan-server-1 infinispan-server-2"/>
@@ -113,90 +112,18 @@ L1 Cache in the Infinispan subsystem:
 </remote-cache-container>
 ```
 
-
-
-
-
-
-# ===================================================
-# WIP
-# ===================================================
-
-## https://issues.jboss.org/browse/EAP7-1109
-
-BRANCH https://github.com/wildfly-clustering/wildfly/tree/remote
-
-COMMUNITY DOC https://github.com/wildfly/wildfly/blob/3e1d218d089768e404f97d387dddb745eb17d05b/docs/src/main/asciidoc/_high-availability/subsystem-support/Distributable_Web_Applications.adoc
-
-## PR and bits
-
-https://github.com/wildfly/wildfly/pull/11662
-/home/hudson/static_build_env/clustering/wildfly/wildfly-remote.zip (branch is pferraro:remote)
-
-
-## sample cli
-
-sample configuration: 
-https://github.com/pferraro/wildfly/blob/remote/testsuite/integration/clustering/src/test/java/org/jboss/as/test/clustering/cluster/web/remote/AbstractHotRodWebFailoverTestCase.java#L52
-
-## L1 cache configuration
-
-we have to test:
-- L1 + sticky session, ATTRIBUTE vs SESSION granularity (affinity=local)
-- NO L1, NO sticky session ==> NO it's a bad config and it's not recommended
-
-http://wildscribe.github.io/WildFly/16.0/subsystem/infinispan/remote-cache-container/near-cache/invalidation/index.html
-
-## questions
-
-- is it the hotrod-session-management element that triggers new behaviour ? __yes - it's the hotrod-session-management that enables use of the hotrod-based session manager; although, assuming the subsystem exists, you can define a deployment specific session manager without the need to define one in the distributable-web subsystem__
-- is the jboss-all.xml supposed to be in the META-INF directory? why in CoarseHotRodWebFailoverTestCase it is added to the WEB-INF dir? :
-war.addAsWebInfResource(CoarseHotRodWebFailoverTestCase.class.getPackage(), "jboss-all_coarse.xml", "jboss-all.xml"); __jboss-all.xml can appear in either META-INF or WEB-INF__
-- why did you always use jboss-all.xml in test and not distributable-web.xml ? __it doesn't matter which is used - they are parsed by the same logic__
-
-## Zulip
-
-__me:__ Can the remote-cache-container(default-remote-cluster=infinispan-server-cluster) 
-be used without the distributable-web subsystem and still get the same result: i.e. using the HotRod-based distributed session manager ? _(I was asking because I could not see any reference to the new session manager anywhere but in the infinispan subsystem)_
-
-__Paul:__ No - the deployment unit processors that detect and process the distributable-web deployment descriptors are defined by the distributable-web subsystem.  So, the subsystem must exist._(not sure we understood each other)_
-
-__me:__ is this __"module=org.wildfly.clustering.web.hotrod"__ that makes the difference between traditional session manager and the new hot rod based session manager? :
-/subsystem=infinispan/remote-cache-container=web:add(default-remote-cluster=infinispan-server-cluster, module=org.wildfly.clustering.web.hotrod)
-/subsystem=infinispan/remote-cache-container=web:add(default-remote-cluster=infinispan-server-cluster)
-
-__Paul:__ no, however, the module is needed to load the marshalling classes required for the session manager to work
-
-__me:__ is the jboss-all.xml supposed to be in the META-INF directory? why in CoarseHotRodWebFailoverTestCase it is added to the WEB-INF dir? :
-war.addAsWebInfResource(CoarseHotRodWebFailoverTestCase.class.getPackage(), "jboss-all_coarse.xml", "jboss-all.xml");
-
-__Paul:__ yes - it's the __hotrod-session-management__ in e.g. jboss-all.xml, that enables use of the hotrod-based session manager:
+Then, on each WildFly node, we create a profile where the HotRod session manager is used to manage cache entries that, eventually, 
+are stored in the remote Infinispan Server cluster through the WildFly Infinispan subsystem:
 
 ```
-<jboss xmlns="urn:jboss:1.0">
-  <distributable-web xmlns="urn:jboss:distributable-web:1.0">
-    <hotrod-session-management remote-cache-container="web" granularity="ATTRIBUTE">
-      <local-affinity/>
+<subsystem xmlns="urn:jboss:domain:distributable-web:1.0" default-session-management="default" default-single-sign-on-management="default">
+    ...
+    <hotrod-session-management name="datagrid-sm" granularity="SESSION" remote-cache-container="datagrid-cc">
+        <local-affinity/>
     </hotrod-session-management>
-  </distributable-web>
-</jboss>
+    ...
+</subsystem>
 ```
-
-although, assuming the subsystem exists, you can define a deployment specific session manager without the need to define one in the distributable-web subsystem;
-jboss-all.xml can appear in either META-INF or WEB-INF;
-it doesn't matter which is used - they are parsed by the same logic
-
-__me:__ to use __hotrod-session-management__ you need to have the connection to infinispan in place:
-
-```
- // remote-cache-container=web
-/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-1:add(port=11622,host=%s)
-/subsystem=infinispan/remote-cache-container=web:add(default-remote-cluster=infinispan-server-cluster, module=org.wildfly.clustering.web.hotrod)
-/subsystem=infinispan/remote-cache-container=web/remote-cluster=infinispan-server-cluster:add(socket-bindings=[infinispan-server-1])
-/subsystem=distributable-web/routing=infinispan:remove
-/subsystem=distributable-web/routing=local:add
-```
-
 
 
 

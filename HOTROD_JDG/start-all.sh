@@ -124,6 +124,7 @@ configureJdg(){
   echo ''
   echo '======================================='
   echo "CONFIGURE JDG"
+  cat $JDG_CLI_SCRIPT
   echo '======================================='
   $JDG_DIRECTORY/JDG1/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT
   sleep 2
@@ -135,9 +136,12 @@ configureWildFly(){
   echo ''
   echo '======================================='
   echo "CONFIGURE WILDFLY"
+  cat $WLF_CLI_SCRIPT
   echo '======================================='
+  cp -f $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml.ORIG
   $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT
   sleep 2
+  cp -f $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml.ORIG
   $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT
   sleep 2
 }
@@ -268,10 +272,10 @@ startWFL1
 sleep 5
 
 startWFL2
-sleep 25
+sleep 20
 
 deployToWildFly
-sleep 15
+sleep 20
 
 echo ''
 first_print=true

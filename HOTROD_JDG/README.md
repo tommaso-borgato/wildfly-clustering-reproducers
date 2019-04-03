@@ -37,10 +37,9 @@ You have two options with L1 cache:
 
 ### Affinity
 
-When using L1 cache with HotRod session manager it is recommended to use sticky session; this translates to setting routing=LOCAL for the HotRod session manager:
+When using L1 cache with HotRod session manager it is recommended to use sticky session; this translates to setting routing=LOCAL for the HotRod session manager (see `<local-affinity/>` later on);
 
-```
-```
+> NOTE: find [here](http://wildscribe.github.io/WildFly/16.0/subsystem/infinispan/remote-cache-container/near-cache/invalidation/index.html) documentation on L1 cache
 
 THis ensures that requests to the Infinispan Server cluster are always directed ("routed") to the node that last handled a request for a given session.
 

@@ -124,11 +124,18 @@ configureJdg(){
   echo ''
   echo '======================================='
   echo "CONFIGURE JDG"
-  cat $JDG_CLI_SCRIPT
+  JDG_CLI_SCRIPT_TMP_1=$JDG_DIRECTORY/1_$(basename $JDG_CLI_SCRIPT)
+  JDG_CLI_SCRIPT_TMP_2=$JDG_DIRECTORY/2_$(basename $JDG_CLI_SCRIPT)
+  cp  $JDG_CLI_SCRIPT $JDG_CLI_SCRIPT_TMP_1
+  cp  $JDG_CLI_SCRIPT $JDG_CLI_SCRIPT_TMP_2
+  sed -i "s/_NODE_IDENTIFIER_/JDG1/g" $JDG_CLI_SCRIPT_TMP_1
+  sed -i "s/_NODE_IDENTIFIER_/JDG2/g" $JDG_CLI_SCRIPT_TMP_2
   echo '======================================='
-  $JDG_DIRECTORY/JDG1/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT
+  cat $JDG_CLI_SCRIPT_TMP_1
+  $JDG_DIRECTORY/JDG1/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_1
   sleep 2
-  $JDG_DIRECTORY/JDG2/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT
+  cat $JDG_CLI_SCRIPT_TMP_2
+  $JDG_DIRECTORY/JDG2/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_2
   sleep 2
 }
 
@@ -136,13 +143,20 @@ configureWildFly(){
   echo ''
   echo '======================================='
   echo "CONFIGURE WILDFLY"
-  cat $WLF_CLI_SCRIPT
+  WLF_CLI_SCRIPT_TMP_1=$WLF_DIRECTORY/1_$(basename $WLF_CLI_SCRIPT)
+  WLF_CLI_SCRIPT_TMP_2=$WLF_DIRECTORY/2_$(basename $WLF_CLI_SCRIPT)
+  cp  $WLF_CLI_SCRIPT $WLF_CLI_SCRIPT_TMP_1
+  cp  $WLF_CLI_SCRIPT $WLF_CLI_SCRIPT_TMP_2
+  sed -i "s/_NODE_IDENTIFIER_/WFL1/g" $WLF_CLI_SCRIPT_TMP_1
+  sed -i "s/_NODE_IDENTIFIER_/WFL2/g" $WLF_CLI_SCRIPT_TMP_2
   echo '======================================='
   cp -f $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml.ORIG
-  $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT
+  cat $WLF_CLI_SCRIPT_TMP_1
+  $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_1
   sleep 2
   cp -f $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml.ORIG
-  $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT
+  cat $WLF_CLI_SCRIPT_TMP_2
+  $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_2
   sleep 2
 }
 

@@ -5,7 +5,7 @@ batch
 /subsystem=infinispan/remote-cache-container=datagrid-cc:add(default-remote-cluster=infinispan-server-cluster, module=org.wildfly.clustering.web.hotrod)
 /subsystem=infinispan/remote-cache-container=datagrid-cc/remote-cluster=infinispan-server-cluster:add(socket-bindings=[infinispan-server-1,infinispan-server-2])
 /subsystem=infinispan/remote-cache-container=datagrid-cc/near-cache=invalidation:add(max-entries=1000)
-# http://wildscribe.github.io/WildFly/16.0/subsystem/infinispan/remote-cache-container/near-cache/invalidation/index.html
 run-batch
 /subsystem=distributable-web/hotrod-session-management=datagrid-sm:add(remote-cache-container=datagrid-cc, granularity=ATTRIBUTE)
 /subsystem=distributable-web/hotrod-session-management=datagrid-sm/affinity=local:add()
+/subsystem=transactions:write-attribute(name=node-identifier,value=_NODE_IDENTIFIER_)

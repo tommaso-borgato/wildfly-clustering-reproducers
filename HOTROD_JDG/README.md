@@ -6,6 +6,8 @@ This HotRod session manager talks directly to the Infinispan Server cluster thro
 
 The cache used by WildFly distributable web app is totally handled by a remote JDG cluster.
 
+> NOTE: You have to use Java 8 for this reproducer because of Infinispan Server
+
 You have two options here:
 
 1. L1 cache: maintain a copy of the entries in the remote JDG cluster, in `invalidation-near-cache` in every WildFly node: the so called L1 cache

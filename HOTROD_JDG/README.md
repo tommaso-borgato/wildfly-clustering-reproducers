@@ -11,11 +11,12 @@ You have two options here:
 1. L1 cache: maintain a copy of the entries in the remote JDG cluster, in `invalidation-near-cache` in every WildFly node: the so called L1 cache
 2. NO L1 cache
 
-> NOTE: Option "2. NO L1 cache" is NOT recommended and, hence, is not tested
+> NOTE: Option "2. NO L1 cache" is NOT recommended 
 
 ## L1 cache
 
-Each WildFly node have an `invalidation-near-cache` which holds a copy of the cache entries and receives invalidation messages directly from the Infinispan Server cluster.
+Each WildFly node have a "Level 1 Invalidation cache" (see `invalidation-near-cache`) which holds a copy of the cache entries for which the node has ever received a request;
+The node receives invalidation messages for the L1 cache directly from the Infinispan Server cluster.
 
 Instead, in a traditional configuration (like in reproducer `INVALIDATION_JDG`), invalidation messages are exchanged between WildFly nodes.
 
@@ -25,8 +26,6 @@ You have two options with L1 cache:
 
 1. Transactional L1 cache
 2. NON Transactional L1 cache
-
-> NOTE: Option "2. NON Transactional L1 cache" is NOT recommended and, hence, is not tested
 
 ### Granularity
 

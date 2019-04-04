@@ -286,10 +286,10 @@ startWFL1
 sleep 5
 
 startWFL2
-sleep 20
+sleep 10
 
 deployToWildFly
-sleep 20
+sleep 10
 
 echo ''
 first_print=true

@@ -3,3 +3,23 @@ embed-server --std-out=echo --server-config=clustered.xml
 /subsystem=logging/logger=org.infinispan.container.EntryFactoryImpl:add(category=org.infinispan.container.EntryFactoryImpl,level=TRACE)
 /subsystem=logging/logger=org.infinispan.container.EntryFactoryImpl:add-handler(name=CONSOLE)
 /subsystem=transactions:write-attribute(name=node-identifier,value=_NODE_IDENTIFIER_)
+# ATTEMPTS TO USE A TRANSACTIONAL CACHE: ALL FAILED
+# distributed default
+#/subsystem=datagrid-infinispan/cache-container=clustered/configurations=CONFIGURATIONS/distributed-cache-configuration=default/transaction=TRANSACTION:add(locking=OPTIMISTIC,mode=NON_XA)
+#/subsystem=datagrid-infinispan/cache-container=clustered/distributed-cache=distributed-webapp.war:add(configuration=default)
+# local ad hoc default + ad hoc cache
+#/subsystem=datagrid-infinispan/cache-container=clustered/configurations=CONFIGURATIONS/local-cache-configuration=distributed-webapp:add()
+#/subsystem=datagrid-infinispan/cache-container=clustered/configurations=CONFIGURATIONS/local-cache-configuration=distributed-webapp/transaction=TRANSACTION:add(locking=OPTIMISTIC,mode=NON_XA)
+#/subsystem=datagrid-infinispan/cache-container=clustered/local-cache=distributed-webapp.war:add(configuration=distributed-webapp)
+# distributed ad hoc default + ad hoc cache
+#/subsystem=datagrid-infinispan/cache-container=clustered/configurations=CONFIGURATIONS/distributed-cache-configuration=distributed-webapp:add()
+#/subsystem=datagrid-infinispan/cache-container=clustered/configurations=CONFIGURATIONS/distributed-cache-configuration=distributed-webapp/transaction=TRANSACTION:add(locking=OPTIMISTIC,mode=NON_XA)
+#/subsystem=datagrid-infinispan/cache-container=clustered/distributed-cache=distributed-webapp.war:add(configuration=distributed-webapp)
+# replicated default
+#/subsystem=datagrid-infinispan/cache-container=clustered/configurations=CONFIGURATIONS/replicated-cache-configuration=configuration-rct:add()
+#/subsystem=datagrid-infinispan/cache-container=clustered/configurations=CONFIGURATIONS/replicated-cache-configuration=configuration-rct/transaction=TRANSACTION:add(locking=OPTIMISTIC,mode=NON_XA)
+#/subsystem=datagrid-infinispan/cache-container=clustered/replicated-cache=distributed-webapp.war:add(configuration=configuration-rct)
+# workaround
+#/subsystem=datagrid-infinispan/cache-container=clustered/distributed-cache=default:remove()
+#/subsystem=datagrid-infinispan/cache-container=clustered/configurations=CONFIGURATIONS/distributed-cache-configuration=default:remove()
+

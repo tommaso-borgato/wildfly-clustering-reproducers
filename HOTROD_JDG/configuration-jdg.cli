@@ -5,7 +5,7 @@ embed-server --std-out=echo --server-config=clustered.xml
 /subsystem=transactions:write-attribute(name=node-identifier,value=_NODE_IDENTIFIER_)
 # ATTEMPTS TO USE A TRANSACTIONAL CACHE: ALL FAILED
 # distributed default
-#/subsystem=datagrid-infinispan/cache-container=clustered/configurations=CONFIGURATIONS/distributed-cache-configuration=default/transaction=TRANSACTION:add(locking=OPTIMISTIC,mode=NON_XA)
+/subsystem=datagrid-infinispan/cache-container=clustered/configurations=CONFIGURATIONS/distributed-cache-configuration=default/transaction=TRANSACTION:add(locking=PESSIMISTIC,mode=NON_XA)
 #/subsystem=datagrid-infinispan/cache-container=clustered/distributed-cache=distributed-webapp.war:add(configuration=transactional)
 # local ad hoc default + ad hoc cache
 #/subsystem=datagrid-infinispan/cache-container=clustered/configurations=CONFIGURATIONS/local-cache-configuration=distributed-webapp:add()

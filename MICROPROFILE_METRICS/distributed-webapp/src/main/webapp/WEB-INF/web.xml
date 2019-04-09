@@ -1,0 +1,17 @@
+<web-app version="3.0"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+    <!-- Clustering: this activates server caches -->
+    <distributable/>
+
+    <session-config>
+        <session-timeout>5</session-timeout>
+        <!-- minutes -->
+    </session-config>
+
+    <welcome-file-list>
+        <welcome-file>home.html</welcome-file>
+    </welcome-file-list>
+</web-app>

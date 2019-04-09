@@ -39,7 +39,7 @@ startJDG2(){
 addUsersJdg(){
   echo ''
   echo '======================================='
-  echo 'ADDING USERS TO WILDFLY'
+  echo 'ADDING USERS TO JDG'
   echo '======================================='
   $WLF_DIRECTORY/JDG1/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
   $WLF_DIRECTORY/JDG2/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
@@ -52,7 +52,7 @@ addUsersJdg(){
 addUsersWildFly(){
   echo ''
   echo '======================================='
-  echo 'ADDING USERS TO JDG'
+  echo 'ADDING USERS TO WILDFLY'
   echo '======================================='
   $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
   $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!

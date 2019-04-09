@@ -175,37 +175,4 @@ sleep 5
 deployToWildFly
 sleep 5
 
-exitWithMsg prova
-
-echo ''
-first_print=true
-while true; do
-  echo -n -e "\rSESSION DATA: "
-  curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8180/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8280/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8180/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8280/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8180/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8280/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8180/$WAR_CONTEXT_PATH/session
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8280/$WAR_CONTEXT_PATH/session
-  sleep 1
-  if [[ "$first_print" = true ]] ; then
-        echo -n -e "\t\t\t(press CTRL+C to exit)"
-        first_print=false
-  fi
-done
+exitWithMsg "paste 'http://localhost:8180/distributed-webapp/session' or 'http://localhost:8280/distributed-webapp/session' in your browser ..."

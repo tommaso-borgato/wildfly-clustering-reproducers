@@ -40,7 +40,7 @@
     </dependencies>
 
     <build>
-        <finalName>distributed-webapp</finalName>
+        <finalName>clusterbench</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

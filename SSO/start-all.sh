@@ -6,7 +6,7 @@ startWFL1(){
   echo "STARTING WFL1"
   echo $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
   echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL1 --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
+  gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL1 --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1
 }
 
 startWFL2(){
@@ -15,7 +15,7 @@ startWFL2(){
   echo "STARTING WFL2"
   echo $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
   echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
+  gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=100
 }
 
 addUsersWildFly(){
@@ -139,8 +139,8 @@ fi
 # ========================
 export WLF_CLI_SCRIPT=configuration.cli
 export MVN_PROFILE="-q"
-export WAR_FINAL_NAME=distributed-webapp.war
-export WAR_CONTEXT_PATH=distributed-webapp
+export WAR_FINAL_NAME=clusterbench.war
+export WAR_CONTEXT_PATH=clusterbench
 echo -e "${GREEN}\n=======================================\nUsing WLF_CLI_SCRIPT $WLF_CLI_SCRIPT\nUsing WAR_FINAL_NAME $WAR_FINAL_NAME\nUsing WAR_CONTEXT_PATH $WAR_CONTEXT_PATH\nUsing JDG_CLI_SCRIPT $JDG_CLI_SCRIPT\n=======================================\n${NC}"
 
 mkdir -p $WLF_DIRECTORY
@@ -175,4 +175,4 @@ sleep 5
 deployToWildFly
 sleep 5
 
-exitWithMsg "paste 'http://localhost:8180/distributed-webapp/session' or 'http://localhost:8280/distributed-webapp/session' in your browser ..."
+exitWithMsg "paste \"http://localhost:8180/$WAR_CONTEXT_PATH/session\" or \"http://localhost:8280/$WAR_CONTEXT_PATH/session\" in your browser ..."

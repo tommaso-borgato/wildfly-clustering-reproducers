@@ -29,10 +29,10 @@ addUsersWildFly(){
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -a -u ejb -p test
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -a -u ejb -p test
-  $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro User
-  $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro User
-  $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro User
-  $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro User
+  #$WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro User
+  #$WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro User
+  #$WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro User
+  #$WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro User
   echo ''
   echo '======================================='
   echo 'SSO USER alice / alice'
@@ -74,13 +74,15 @@ configureWildFly(){
   echo ''
   echo '======================================='
   echo "CONFIGURE WILDFLY"
-  WLF_CLI_SCRIPT_TMP_1=$WLF_DIRECTORY/1_$(basename $WLF_CLI_SCRIPT)
-  WLF_CLI_SCRIPT_TMP_2=$WLF_DIRECTORY/2_$(basename $WLF_CLI_SCRIPT)
-  cp  $WLF_CLI_SCRIPT $WLF_CLI_SCRIPT_TMP_1
-  cp  $WLF_CLI_SCRIPT $WLF_CLI_SCRIPT_TMP_2
+  WLF_CLI_SCRIPT_TMP_1=$WLF_DIRECTORY/1_$(basename $WLF_CLI_SCRIPT1)
+  WLF_CLI_SCRIPT_TMP_2=$WLF_DIRECTORY/2_$(basename $WLF_CLI_SCRIPT2)
+  cp  $WLF_CLI_SCRIPT1 $WLF_CLI_SCRIPT_TMP_1
+  cp  $WLF_CLI_SCRIPT2 $WLF_CLI_SCRIPT_TMP_2
   sed -i "s/_NODE_IDENTIFIER_/WFL1/g" $WLF_CLI_SCRIPT_TMP_1
   sed -i "s/_NODE_IDENTIFIER_/WFL2/g" $WLF_CLI_SCRIPT_TMP_2
   echo '======================================='
+  keytool -genkeypair -alias localhost -keyalg RSA -keysize 1024 -validity 365 -keystore $WLF_DIRECTORY/WFL1/standalone/configuration/keystore.jks -dname "CN=localhost" -keypass secret -storepass secret
+  keytool -genkeypair -alias localhost -keyalg RSA -keysize 1024 -validity 365 -keystore $WLF_DIRECTORY/WFL2/standalone/configuration/keystore.jks -dname "CN=localhost" -keypass secret -storepass secret
   cp -f $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT_TMP_1
   $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_1
@@ -142,11 +144,12 @@ fi
 # ========================
 # Profile
 # ========================
-export WLF_CLI_SCRIPT=configuration.cli
+export WLF_CLI_SCRIPT1=configuration1.cli
+export WLF_CLI_SCRIPT2=configuration2.cli
 export MVN_PROFILE="-q"
 export WAR_FINAL_NAME=clusterbench.war
 export WAR_CONTEXT_PATH=clusterbench
-echo -e "${GREEN}\n=======================================\nUsing WLF_CLI_SCRIPT $WLF_CLI_SCRIPT\nUsing WAR_FINAL_NAME $WAR_FINAL_NAME\nUsing WAR_CONTEXT_PATH $WAR_CONTEXT_PATH\nUsing JDG_CLI_SCRIPT $JDG_CLI_SCRIPT\n=======================================\n${NC}"
+echo -e "${GREEN}\n=======================================\nUsing WLF_CLI_SCRIPT $WLF_CLI_SCRIPT1 and $WLF_CLI_SCRIPT2\nUsing WAR_FINAL_NAME $WAR_FINAL_NAME\nUsing WAR_CONTEXT_PATH $WAR_CONTEXT_PATH\nUsing JDG_CLI_SCRIPT $JDG_CLI_SCRIPT\n=======================================\n${NC}"
 
 mkdir -p $WLF_DIRECTORY
 
@@ -160,6 +163,8 @@ rm -f /tmp/cookies1
 rm -f /tmp/cookies2
 rm -f /tmp/cookies3
 rm -f /tmp/cookies4
+rm -rfd /tmp/clustering-realm-1
+rm -rfd /tmp/clustering-realm-2
 sleep 1
 
 downloadWildFly

@@ -1,0 +1,22 @@
+embed-server --std-out=echo --server-config=standalone-ha.xml
+# elytron
+## realm
+/subsystem=elytron/filesystem-realm=clustering-realm:add(path=/tmp/clustering-realm-1)
+## domain --> realm
+/subsystem=elytron/security-domain=clustering-domain:add(default-realm=clustering-realm, permission-mapper=default-permission-mapper,realms=[{realm=clustering-realm, role-decoder=groups-to-roles}]
+## user
+/subsystem=elytron/filesystem-realm=clustering-realm:add-identity(identity=alice)
+/subsystem=elytron/filesystem-realm=clustering-realm:set-password(identity=alice, clear={password=alice})
+/subsystem=elytron/filesystem-realm=clustering-realm:add-identity-attribute(identity=alice, name=groups, value=["user"])
+## user
+/subsystem=elytron/filesystem-realm=clustering-realm:add-identity(identity=ssoUser)
+/subsystem=elytron/filesystem-realm=clustering-realm:set-password(identity=ssoUser, clear={password=ssoPassw})
+/subsystem=elytron/filesystem-realm=clustering-realm:add-identity-attribute(identity=ssoUser, name=groups, value=["user"])
+## authentication
+/subsystem=elytron/http-authentication-factory=clustering-http-authentication:add(security-domain=clustering-domain, http-server-mechanism-factory=global, mechanism-configurations=[{mechanism-name=FORM}])
+# undertow
+/subsystem=undertow/application-security-domain=other:add(http-authentication-factory=clustering-http-authentication)
+## keytool -genkeypair -alias localhost -keyalg RSA -keysize 1024 -validity 365 -keystore keystore.jks -dname "CN=localhost" -keypass secret -storepass secret
+/subsystem=elytron/key-store=clustering-keystore:add(path=keystore.jks, relative-to=jboss.server.config.dir, credential-reference={clear-text=secret}, type=JKS)
+## sso
+/subsystem=undertow/application-security-domain=other/setting=single-sign-on:add(key-store=clustering-keystore, key-alias=localhost, domain=localhost, credential-reference={clear-text=secret})

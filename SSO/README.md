@@ -18,10 +18,10 @@ This way you can just authenticate once to the the whole cluster;
   export WLF_ZIP=/some-folder/wildfly-16.0.0.Final.zip
   start-all.sh
   ```
-- hit url [localhost:8180/distributed-webapp/session](http://localhost:8180/distributed-webapp/session) 
+- hit url [localhost:8080/clusterbench1/session](http://localhost:8080/clusterbench1/session) 
   with your browser
 - and authenticate with user: `alice` password: `alice`  
-- change url to [localhost:8280/distributed-webapp/session](http://localhost:8180/distributed-webapp/session) 
+- change url to [localhost:8180/clusterbench2/session](http://localhost:8180/clusterbench2/session) 
   in your browser address bar: you won't be asked again to type your credentials
 - run script:
   ```

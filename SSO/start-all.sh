@@ -99,9 +99,11 @@ deployToWildFly(){
   cd distributed-webapp-sso
   mvn $MVN_PROFILE clean install
   cd -
-  cp -fv distributed-webapp-sso/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/
+  cp -fv distributed-webapp-sso/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/clusterbench1.war
+  cp -fv distributed-webapp-sso/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/clusterbench2.war
   sleep 2
-  cp -fv distributed-webapp-sso/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/
+  cp -fv distributed-webapp-sso/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/clusterbench1.war
+  cp -fv distributed-webapp-sso/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/clusterbench2.war
   sleep 2
 }
 

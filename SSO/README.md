@@ -42,19 +42,85 @@ Each domain, in turn, relies on a `realm` for user management:
 - `ApplicationDomain` --> `ApplicationRealm`
 - `ManagementDomain`  --> `ManagementRealm`
 
-We are going to add our sso user to `ApplicationRealm` which happens to be a `properties-realm` (= users are held in some properties file on disk):
+Given this, first we configure WildFly following the steps described here [WFLY Web+Single+Sign-On](https://docs.jboss.org/author/display/WFLY/Web+Single+Sign-On);
 
-```xml
-<properties-realm name="ApplicationRealm">
-    <users-properties path="application-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="ApplicationRealm"/>
-    <groups-properties path="application-roles.properties" relative-to="jboss.server.config.dir"/>
-</properties-realm>
+First we create a realm for holding users:
+
+```xpath
+/subsystem=elytron/filesystem-realm=clustering-realm:add(path=/tmp/clustering-realm-1)
 ```
 
-We add our sso user to `ApplicationRealm` using the `add-user.sh` script:
+Then we create domain that uses realm
+
+```xpath
+/subsystem=elytron/security-domain=clustering-domain:add(default-realm=clustering-realm, permission-mapper=default-permission-mapper,realms=[{realm=clustering-realm, role-decoder=groups-to-roles}]
+```
+
+Then we add users to our realm:
+```xpath
+/subsystem=elytron/filesystem-realm=clustering-realm:add-identity(identity=alice)
+/subsystem=elytron/filesystem-realm=clustering-realm:set-password(identity=alice, clear={password=alice})
+/subsystem=elytron/filesystem-realm=clustering-realm:add-identity-attribute(identity=alice, name=groups, value=["user"])
+```
+
+We add to elytron (the security module in WildFLy) the possibility to authenticate via FORM to our domain:
+
+```xpath
+/subsystem=elytron/http-authentication-factory=clustering-http-authentication:add(security-domain=clustering-domain, http-server-mechanism-factory=global, mechanism-configurations=[{mechanism-name=FORM}])
+```
+
+Then we add to undertow (the web module in WildFLy) the default application security domain for secured apps:
+
+```xpath
+/subsystem=undertow/application-security-domain=other:add(http-authentication-factory=clustering-http-authentication)
+```
+
+We need a keystore:
 
 ```bash
-add-user.sh -a -u alice -p alice -r ApplicationRealm -ro User
+keytool -genkeypair -alias localhost -keyalg RSA -keysize 1024 -validity 365 -keystore keystore.jks -dname "CN=localhost" -keypass secret -storepass secret
 ```
+
+```xpath
+/subsystem=elytron/key-store=clustering-keystore:add(path=keystore.jks, relative-to=jboss.server.config.dir, credential-reference={clear-text=secret}, type=JKS)
+```
+
+And finally we add SSO to undertow:
+
+```xpath
+/subsystem=undertow/application-security-domain=other/setting=single-sign-on:add(key-store=clustering-keystore, key-alias=localhost, domain=localhost, credential-reference={clear-text=secret})
+```
+
+## Using a load balancer
+
+When using a load balancer (like HAProxy) we must take into account the fact that the domain plays a pivotal role;
+
+This is the regular flow:
+
+- the client requests a secure url through the load balancer; let's say the load balancer's IP is `1.1.1.1`, hence the ulr can be something like `http://1.1.1.1/clusterbenc1/session`
+- the server load balancer forwards the request to a WildFly node; let's say the node's IP is `2.2.2.2`
+- the server send back a form to use for authentication
+- the client receives the form and posts username and password to a url like h`ttp://1.1.1.1/clusterbenc1/j_security_check`
+- the load balancer forwards the request to the WildFly node that checks the credentials and sends back an authentication cookie;
+  this cookie is names `JSESSIONIDSSO` and has an attribute named `domain` that is set to the value used to configure SSO in undertow (`localhost` in this case):
+  ```xpath
+  /subsystem=undertow/application-security-domain=other/setting=single-sign-on:add(key-store=clustering-keystore, key-alias=localhost, domain=localhost, credential-reference={clear-text=secret})
+  ```
+- the client receives this cookie and is, from now on, authenticated to the `localhost` domain
+
+What's the problem here?
+
+The problem is that the client also receives a response HTTP header `Origin: http://1.1.1.1` that point to the load balancer;
+The client compares `1.1.1.1` with `localhost` and discards the `JSESSIONIDSSO` as not belonging to the response domain;
+
+We have two options here:
+
+- set the correct domain in the WildFly node:   
+  ```xpath
+    /subsystem=undertow/application-security-domain=other/setting=single-sign-on:add(key-store=clustering-keystore, key-alias=localhost, domain=1.1.1.1, credential-reference={clear-text=secret})
+    ```
+- have the load balancer to 
+  - remap the `JSESSIONIDSSO`'s `domain` attribute from `localhost` to `1.1.1.1` in the WildFly to client direction (so the client does not discard it)
+  - remap back the `JSESSIONIDSSO`'s `domain` attribute from `1.1.1.1` to `localhost` in the client to WildFly direction (so the server recognise it and considers the requests already authenticated)  
 
 

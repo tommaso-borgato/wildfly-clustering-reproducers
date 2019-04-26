@@ -1,0 +1,7 @@
+embed-server --std-out=echo --server-config=standalone-load-balancer.xml
+/subsystem=undertow/configuration=handler/reverse-proxy=my-handler:add()
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-host1/:add(host=127.0.0.1, port=8109)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-host2/:add(host=127.0.0.1, port=8209)
+/subsystem=undertow/configuration=handler/reverse-proxy=my-handler/host=host1:add(outbound-socket-binding=remote-host1, scheme=ajp, instance-id=myroute, path=/clusterbench)
+/subsystem=undertow/configuration=handler/reverse-proxy=my-handler/host=host2:add(outbound-socket-binding=remote-host2, scheme=ajp, instance-id=myroute, path=/clusterbench)
+/subsystem=undertow/server=default-server/host=default-host/location=\/clusterbench:add(handler=my-handler)

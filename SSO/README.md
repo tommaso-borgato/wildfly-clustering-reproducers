@@ -113,6 +113,12 @@ What's the problem here?
 The problem is that the client also receives a response HTTP header `Origin: http://1.1.1.1` that point to the load balancer;
 The client compares `1.1.1.1` with `localhost` and discards the `JSESSIONIDSSO` as not belonging to the response domain;
 
+When using JMeter as client you get the following error:
+
+```java
+2019-04-17 07:17:18,806 WARN o.a.h.c.p.ResponseProcessCookies: Cookie rejected [JSESSIONIDSSO="r_h-gNoUTwD7uvrwlkLkji1fuNjnHFB-8KUocOrp", version:0, domain:10.0.145.202, path:/, expiry:null] Illegal 'domain' attribute "10.0.145.202". Domain of origin: "127.0.0.1"
+```
+
 We have two options here:
 
 - set the correct domain in the WildFly node:   

@@ -1,0 +1,38 @@
+embed-server --std-out=echo --server-config=standalone-ha.xml
+## ====================================
+## HOTROD
+## ====================================
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-1:add(host=127.0.0.1,port=11522)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-2:add(host=127.0.0.1,port=11622)
+batch
+/subsystem=infinispan/remote-cache-container=datagrid-cc:add(default-remote-cluster=infinispan-server-cluster, module=org.wildfly.clustering.web.hotrod)
+/subsystem=infinispan/remote-cache-container=datagrid-cc/remote-cluster=infinispan-server-cluster:add(socket-bindings=[infinispan-server-1,infinispan-server-2])
+#/subsystem=infinispan/remote-cache-container=datagrid-cc/near-cache=invalidation:add(max-entries=1000)
+run-batch
+## HOTROD SSO
+/subsystem=distributable-web/hotrod-single-sign-on-management=remote:add(remote-cache-container=datagrid-cc)
+/subsystem=distributable-web:write-attribute(name=default-single-sign-on-management, value=remote)
+## ====================================
+## SSO
+## ====================================
+# elytron
+## realm
+/subsystem=elytron/filesystem-realm=clustering-realm:add(path=/tmp/clustering-realm-2)
+## domain --> realm
+/subsystem=elytron/security-domain=clustering-domain:add(default-realm=clustering-realm, permission-mapper=default-permission-mapper,realms=[{realm=clustering-realm, role-decoder=groups-to-roles}]
+## user
+/subsystem=elytron/filesystem-realm=clustering-realm:add-identity(identity=alice)
+/subsystem=elytron/filesystem-realm=clustering-realm:set-password(identity=alice, clear={password=alice})
+/subsystem=elytron/filesystem-realm=clustering-realm:add-identity-attribute(identity=alice, name=groups, value=["User"])
+## user
+/subsystem=elytron/filesystem-realm=clustering-realm:add-identity(identity=ssoUser)
+/subsystem=elytron/filesystem-realm=clustering-realm:set-password(identity=ssoUser, clear={password=ssoPassw})
+/subsystem=elytron/filesystem-realm=clustering-realm:add-identity-attribute(identity=ssoUser, name=groups, value=["User"])
+## authentication
+/subsystem=elytron/http-authentication-factory=clustering-http-authentication:add(security-domain=clustering-domain, http-server-mechanism-factory=global, mechanism-configurations=[{mechanism-name=FORM}])
+# undertow
+/subsystem=undertow/application-security-domain=other:add(http-authentication-factory=clustering-http-authentication)
+## keytool -genkeypair -alias localhost -keyalg RSA -keysize 1024 -validity 365 -keystore keystore.jks -dname "CN=localhost" -keypass secret -storepass secret
+/subsystem=elytron/key-store=clustering-keystore:add(path=keystore.jks, relative-to=jboss.server.config.dir, credential-reference={clear-text=secret}, type=JKS)
+## UNDERTOW SSO
+/subsystem=undertow/application-security-domain=other/setting=single-sign-on:add(key-store=clustering-keystore, key-alias=localhost, domain=localhost, credential-reference={clear-text=secret})

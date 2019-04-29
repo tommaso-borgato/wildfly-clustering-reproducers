@@ -54,14 +54,14 @@ addUsersWildFly(){
   echo '======================================='
   echo 'ADDING USERS TO WILDFLY'
   echo '======================================='
-  $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013! -ro User
-  $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013! -ro User
+  $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013!
+  $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013!
   $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -a -u ejb -p test
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -a -u ejb -p test
-  #$WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u alice -p alice -ro User
-  #$WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u alice -p alice -ro User
+  #$WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro User
+  #$WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro User
   #$WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro User
   #$WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro User
   echo ''
@@ -69,7 +69,6 @@ addUsersWildFly(){
   echo 'SSO USER alice / alice'
   echo 'SSO USER ssoUser / ssoPassw'
   echo '======================================='
-  sleep 2
 }
 
 downloadJdg() {
@@ -143,10 +142,8 @@ configureJdg(){
   echo '======================================='
   cat $JDG_CLI_SCRIPT_TMP_1
   $JDG_DIRECTORY/JDG1/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_1
-  sleep 2
   cat $JDG_CLI_SCRIPT_TMP_2
   $JDG_DIRECTORY/JDG2/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_2
-  sleep 2
 }
 
 configureWildFly(){
@@ -165,11 +162,9 @@ configureWildFly(){
   cp -f $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT_TMP_1
   $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_1
-  sleep 2
   cp -f $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT_TMP_2
   $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_2
-  sleep 2
 }
 
 deployToWildFly(){
@@ -250,28 +245,22 @@ rm -rfd /tmp/clustering-realm-2
 sleep 1
 
 downloadJdg
-sleep 1
 
 downloadWildFly
-sleep 1
 
 addUsersJdg
-sleep 1
 
 addUsersWildFly
-sleep 1
 
 configureJdg
-sleep 1
 
 configureWildFly
-sleep 1
 
 startJDG1
 sleep 5
 
 startJDG2
-sleep 20
+sleep 10
 
 startWFL1
 sleep 5

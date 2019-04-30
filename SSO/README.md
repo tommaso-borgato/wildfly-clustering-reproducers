@@ -1,4 +1,4 @@
-# SSO Single Sign On
+# Clustered SSO (Single Sign On)
 
 Demonstrates how to run SSO on a 2 nodes WildFly cluster;
 

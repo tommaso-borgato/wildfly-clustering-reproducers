@@ -1,10 +1,12 @@
-# SSO Single Sign On
+# Clustered SSO (Single Sign On)
 
 Demonstrates how to run SSO on a 2 nodes WildFly cluster;
 
 When you have a cluster of WildFly nodes, you can transparently propagate authenticated session to all the nodes;
 
 This way you can just authenticate once to the the whole cluster;
+
+In this scenario the SSO information is off-loaded to a JDG Cluster;
 
 ## Steps
 

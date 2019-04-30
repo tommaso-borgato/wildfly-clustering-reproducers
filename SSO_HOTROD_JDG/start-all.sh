@@ -60,10 +60,10 @@ addUsersWildFly(){
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -a -u ejb -p test
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -a -u ejb -p test
-  #$WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro User
-  #$WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro User
-  #$WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro User
-  #$WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro User
+  $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro user -g user
+  $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro user -g user
+  $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro user
+  $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro user
   echo ''
   echo '======================================='
   echo 'SSO USER alice / alice'
@@ -240,8 +240,8 @@ rm -f /tmp/cookies1
 rm -f /tmp/cookies2
 rm -f /tmp/cookies3
 rm -f /tmp/cookies4
-rm -rfd /tmp/clustering-realm-1
-rm -rfd /tmp/clustering-realm-2
+rm -rfd /tmp/clustering-filesystem-realm-node1
+rm -rfd /tmp/clustering-filesystem-realm-node2
 sleep 1
 
 downloadJdg
@@ -257,18 +257,17 @@ configureJdg
 configureWildFly
 
 startJDG1
-sleep 5
+sleep 2
 
 startJDG2
-sleep 10
+sleep 5
 
 startWFL1
-sleep 5
+sleep 2
 
 startWFL2
 sleep 5
 
 deployToWildFly
-sleep 5
 
 exitWithMsg "paste \"http://localhost:8180/$WAR_CONTEXT_PATH/session\" or \"http://localhost:8280/$WAR_CONTEXT_PATH/session\" in your browser ..."

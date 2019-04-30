@@ -1,2 +1,0 @@
-embed-server --std-out=echo --server-config=standalone-ha.xml
-/subsystem=undertow/server=default-server/host=default-host/setting=single-sign-on:add

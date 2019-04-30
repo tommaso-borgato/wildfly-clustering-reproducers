@@ -6,6 +6,8 @@ When you have a cluster of WildFly nodes, you can transparently propagate authen
 
 This way you can just authenticate once to the the whole cluster;
 
+See [Web_Single_Sign_On](https://docs.wildfly.org/16/WildFly_Elytron_Security.html#Web_Single_Sign_On).
+
 ## Steps
 
 - install `gnome-terminal`:

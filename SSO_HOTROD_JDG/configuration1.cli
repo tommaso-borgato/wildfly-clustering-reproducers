@@ -1,4 +1,5 @@
 embed-server --std-out=echo --server-config=standalone-ha.xml
+/subsystem=transactions:write-attribute(name=node-identifier,value=_NODE_IDENTIFIER_)
 # ============================
 # sso
 # ============================
@@ -30,9 +31,20 @@ embed-server --std-out=echo --server-config=standalone-ha.xml
 batch
 /subsystem=infinispan/remote-cache-container=web:add(default-remote-cluster=infinispan-server-cluster, module=org.wildfly.clustering.web.hotrod)
 /subsystem=infinispan/remote-cache-container=web/remote-cluster=infinispan-server-cluster:add(socket-bindings=[infinispan-server-1,infinispan-server-2])
+/subsystem=infinispan/remote-cache-container=web/near-cache=invalidation:add(max-entries=1000)
 run-batch
 # ============================
 # hotrod + sso
 # ============================
 /subsystem=distributable-web/hotrod-single-sign-on-management=remote:add(remote-cache-container=web)
 /subsystem=distributable-web:write-attribute(name=default-single-sign-on-management, value=remote)
+# ============================
+# log
+# ============================
+/subsystem=logging/logger=org.jboss.security:add(level=ALL)
+/subsystem=logging/logger=org.jboss.as.security:add(level=ALL)
+/subsystem=logging/logger=org.picketbox:add(level=ALL)
+/subsystem=logging/logger=org.jboss.as.domain.management.security:add(level=ALL)
+/subsystem=logging/logger=org.wildfly.security:add(level=ALL)
+/subsystem=logging/logger=org.wildfly.elytron:add(level=ALL)
+/subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=ALL)

@@ -60,10 +60,10 @@ addUsersWildFly(){
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -a -u ejb -p test
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -a -u ejb -p test
-  $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro user -g user
-  $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro user -g user
-  $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro user
-  $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro user
+  #$WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro user -g user
+  #$WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u alice -p alice -r ApplicationRealm -ro user -g user
+  #$WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro user
+  #$WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u ssoUser -p ssoPassw -r ApplicationRealm -ro user
   echo ''
   echo '======================================='
   echo 'SSO USER alice / alice'

@@ -20,3 +20,13 @@ embed-server --std-out=echo --server-config=standalone-ha.xml
 /subsystem=elytron/key-store=clustering-keystore:add(path=keystore.jks, relative-to=jboss.server.config.dir, credential-reference={clear-text=secret}, type=JKS)
 ## sso
 /subsystem=undertow/application-security-domain=other/setting=single-sign-on:add(key-store=clustering-keystore, key-alias=localhost, domain=localhost, credential-reference={clear-text=secret})
+# ============================
+# log
+# ============================
+/subsystem=logging/logger=org.jboss.security:add(level=ALL)
+/subsystem=logging/logger=org.jboss.as.security:add(level=ALL)
+/subsystem=logging/logger=org.picketbox:add(level=ALL)
+/subsystem=logging/logger=org.jboss.as.domain.management.security:add(level=ALL)
+/subsystem=logging/logger=org.wildfly.security:add(level=ALL)
+/subsystem=logging/logger=org.wildfly.elytron:add(level=ALL)
+/subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=ALL)

@@ -8,6 +8,8 @@ This way you can just authenticate once to the the whole cluster;
 
 In this scenario the SSO information is off-loaded to a JDG Cluster;
 
+See [Web_Single_Sign_On](https://docs.wildfly.org/16/WildFly_Elytron_Security.html#Web_Single_Sign_On).
+
 ## Steps
 
 - install `gnome-terminal`:

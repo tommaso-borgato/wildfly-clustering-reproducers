@@ -38,7 +38,6 @@ addUsersWildFly(){
   echo 'SSO USER alice / alice'
   echo 'SSO USER ssoUser / ssoPassw'
   echo '======================================='
-  sleep 2
 }
 
 downloadWildFly(){
@@ -86,11 +85,9 @@ configureWildFly(){
   cp -f $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT_TMP_1
   $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_1
-  sleep 2
   cp -f $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT_TMP_2
   $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_2
-  sleep 2
 }
 
 deployToWildFly(){

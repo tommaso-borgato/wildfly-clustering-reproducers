@@ -3,4 +3,5 @@ embed-server --std-out=echo --server-config=clustered.xml
 /subsystem=logging/logger=org.infinispan.container.EntryFactoryImpl:add(category=org.infinispan.container.EntryFactoryImpl,level=TRACE)
 /subsystem=logging/logger=org.infinispan.container.EntryFactoryImpl:add-handler(name=CONSOLE)
 /subsystem=transactions:write-attribute(name=node-identifier,value=_NODE_IDENTIFIER_)
+/subsystem=datagrid-infinispan/cache-container=clustered:write-attribute(name=statistics,value=true)
 

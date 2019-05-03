@@ -1,44 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.0"
          xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
-
-    <!-- Clustering -->
     <distributable/>
-
+    <description>SSO and HOTROD Integration Tests</description>
+    <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>org.jboss.as.test.integration.web.sso.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/Logout</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>5</session-timeout>
-        <!-- minutes -->
     </session-config>
-
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>All</web-resource-name>
+            <web-resource-name>Restricted</web-resource-name>
+            <description>Single SignOn Tests</description>
             <url-pattern>/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
-            <role-name>Admin</role-name>
-            <role-name>user</role-name>
+            <description>Only authenticated users can access secure content</description>
+            <role-name>Users</role-name>
         </auth-constraint>
     </security-constraint>
-
     <login-config>
+        <!--<auth-method>BASIC?silent=true,FORM</auth-method>-->
         <auth-method>FORM</auth-method>
-        <!-- <realm-name>ApplicationRealm</realm-name> -->
         <form-login-config>
-            <form-login-page>/login.jsp</form-login-page>
-            <form-error-page>/error.jsp</form-error-page>
+            <form-login-page>/login.html</form-login-page>
+            <form-error-page>/error.html</form-error-page>
         </form-login-config>
     </login-config>
-
     <security-role>
-        <role-name>Admin</role-name>
+        <role-name>Users</role-name>
     </security-role>
-    <security-role>
-        <role-name>user</role-name>
-    </security-role>
-
-    <welcome-file-list>
-        <welcome-file>home.jsp</welcome-file>
-    </welcome-file-list>
 </web-app>

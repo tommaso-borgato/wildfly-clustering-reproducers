@@ -4,3 +4,11 @@
 **/.idea/
 **/postgresql-connector.jar
 .idea/
+INVALIDATION_DB/start.sh
+INVALIDATION_JDG/start.sh
+BASIC/start.sh
+SINGLETON_DEPLOYMENT/start.sh
+SHARED_SESSIONS/start.sh
+HOTROD_JDG/start.sh
+HOTROD_JDG/749680.sh
+SSO/start.sh

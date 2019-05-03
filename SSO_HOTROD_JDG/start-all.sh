@@ -4,8 +4,9 @@ startWFL1(){
   echo ''
   echo '======================================='
   echo "STARTING WFL1"
-  echo $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
+  echo COMMAND_LOG $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
   echo '======================================='
+  export JAVA_HOME=$JAVA_HOME_11
   gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL1 --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
 }
 
@@ -13,8 +14,9 @@ startWFL2(){
   echo ''
   echo '======================================='
   echo "STARTING WFL2"
-  echo $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
+  echo COMMAND_LOG $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
   echo '======================================='
+  export JAVA_HOME=$JAVA_HOME_11
   gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
 }
 
@@ -22,8 +24,9 @@ startJDG1(){
   echo ''
   echo '======================================='
   echo "STARTING JDG1"
-  echo $WLF_DIRECTORY/JDG1/bin/standalone.sh --server-config=clustered.xml -Dprogram.name=JDG1 -Djboss.node.name=JDG1 -Djboss.socket.binding.port-offset=300
+  echo COMMAND_LOG $WLF_DIRECTORY/JDG1/bin/standalone.sh --server-config=clustered.xml -Dprogram.name=JDG1 -Djboss.node.name=JDG1 -Djboss.socket.binding.port-offset=300
   echo '======================================='
+  export JAVA_HOME=$JAVA_HOME_8
   gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/JDG1 --title="JDG1" -- $WLF_DIRECTORY/JDG1/bin/standalone.sh --server-config=clustered.xml -Dprogram.name=JDG1 -Djboss.node.name=JDG1 -Djboss.socket.binding.port-offset=300
 }
 
@@ -31,8 +34,9 @@ startJDG2(){
   echo ''
   echo '======================================='
   echo "STARTING JDG2"
-  echo $WLF_DIRECTORY/JDG2/bin/standalone.sh --server-config=clustered.xml -Dprogram.name=JDG2 -Djboss.node.name=JDG2 -Djboss.socket.binding.port-offset=400
+  echo COMMAND_LOG $WLF_DIRECTORY/JDG2/bin/standalone.sh --server-config=clustered.xml -Dprogram.name=JDG2 -Djboss.node.name=JDG2 -Djboss.socket.binding.port-offset=400
   echo '======================================='
+  export JAVA_HOME=$JAVA_HOME_8
   gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/JDG2 --title="JDG2" -- $WLF_DIRECTORY/JDG2/bin/standalone.sh --server-config=clustered.xml -Dprogram.name=JDG2 -Djboss.node.name=JDG2 -Djboss.socket.binding.port-offset=400
 }
 
@@ -41,12 +45,15 @@ addUsersJdg(){
   echo '======================================='
   echo 'ADDING USERS TO JDG'
   echo '======================================='
-  $WLF_DIRECTORY/JDG1/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013!
-  $WLF_DIRECTORY/JDG2/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013!
+  export JAVA_HOME=$JAVA_HOME_8
+  #$WLF_DIRECTORY/JDG1/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013!
+  #$WLF_DIRECTORY/JDG2/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013!
+  echo COMMAND_LOG $WLF_DIRECTORY/JDG1/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/JDG1/bin/add-user.sh --silent -u admin -p admin123+
+  echo COMMAND_LOG $WLF_DIRECTORY/JDG2/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/JDG2/bin/add-user.sh --silent -u admin -p admin123+
-  $WLF_DIRECTORY/JDG1/bin/add-user.sh --silent -a -u ejb -p test
-  $WLF_DIRECTORY/JDG2/bin/add-user.sh --silent -a -u ejb -p test
+  #$WLF_DIRECTORY/JDG1/bin/add-user.sh --silent -a -u ejb -p test
+  #$WLF_DIRECTORY/JDG2/bin/add-user.sh --silent -a -u ejb -p test
 }
 
 addUsersWildFly(){
@@ -54,9 +61,12 @@ addUsersWildFly(){
   echo '======================================='
   echo 'ADDING USERS TO WILDFLY'
   echo '======================================='
+  export JAVA_HOME=$JAVA_HOME_11
   $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013!
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013!
+  echo COMMAND_LOG $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -u admin -p admin123+
+  echo COMMAND_LOG $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -a -u ejb -p test
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -a -u ejb -p test
@@ -85,6 +95,7 @@ downloadJdg() {
     echo '======================================='
     echo "UNZIP JDG to $JDG_DIRECTORY/JDG1"
     echo '======================================='
+    echo COMMAND_LOG unzip -d $JDG_DIRECTORY/tmp-jdg $JDG_ZIP
     unzip -d $JDG_DIRECTORY/tmp-jdg $JDG_ZIP > /dev/null
     mv $JDG_DIRECTORY/tmp-jdg/*-server* $JDG_DIRECTORY/JDG1
     rm -fdr $JDG_DIRECTORY/tmp-jdg
@@ -114,6 +125,7 @@ downloadWildFly(){
     echo '======================================='
     echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL1"
     echo '======================================='
+    echo COMMAND_LOG unzip -d $WLF_DIRECTORY/tmp-wildfly $WLF_ZIP
     unzip -d $WLF_DIRECTORY/tmp-wildfly $WLF_ZIP > /dev/null
     mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFL1
     rm -fdr $WLF_DIRECTORY/tmp-wildfly
@@ -140,9 +152,12 @@ configureJdg(){
   sed -i "s/_NODE_IDENTIFIER_/JDG1/g" $JDG_CLI_SCRIPT_TMP_1
   sed -i "s/_NODE_IDENTIFIER_/JDG2/g" $JDG_CLI_SCRIPT_TMP_2
   echo '======================================='
+  export JAVA_HOME=$JAVA_HOME_8
   cat $JDG_CLI_SCRIPT_TMP_1
+  cp -f $JDG_DIRECTORY/JDG1/standalone/configuration/clustered.xml $JDG_DIRECTORY/JDG1/standalone/configuration/clustered.xml.ORIG
   $JDG_DIRECTORY/JDG1/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_1
   cat $JDG_CLI_SCRIPT_TMP_2
+  cp -f $JDG_DIRECTORY/JDG2/standalone/configuration/clustered.xml $JDG_DIRECTORY/JDG2/standalone/configuration/clustered.xml.ORIG
   $JDG_DIRECTORY/JDG2/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_2
 }
 
@@ -157,13 +172,16 @@ configureWildFly(){
   sed -i "s/_NODE_IDENTIFIER_/WFL1/g" $WLF_CLI_SCRIPT_TMP_1
   sed -i "s/_NODE_IDENTIFIER_/WFL2/g" $WLF_CLI_SCRIPT_TMP_2
   echo '======================================='
+  export JAVA_HOME=$JAVA_HOME_11
   keytool -genkeypair -alias localhost -keyalg RSA -keysize 1024 -validity 365 -keystore $WLF_DIRECTORY/WFL1/standalone/configuration/keystore.jks -dname "CN=localhost" -keypass secret -storepass secret
   keytool -genkeypair -alias localhost -keyalg RSA -keysize 1024 -validity 365 -keystore $WLF_DIRECTORY/WFL2/standalone/configuration/keystore.jks -dname "CN=localhost" -keypass secret -storepass secret
   cp -f $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT_TMP_1
+  echo COMMAND_LOG $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_1
   $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_1
   cp -f $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT_TMP_2
+  echo COMMAND_LOG $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_2
   $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_2
 }
 
@@ -175,6 +193,7 @@ deployToWildFly(){
   cd distributed-webapp-sso
   mvn $MVN_PROFILE clean install
   cd -
+  echo COMMAND_LOG cp -fv distributed-webapp-sso/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/clusterbench1.war
   cp -fv distributed-webapp-sso/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/clusterbench1.war
   cp -fv distributed-webapp-sso/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/clusterbench2.war
   sleep 2
@@ -193,6 +212,12 @@ exitWithMsg(){
 # ================
 # START
 # ================
+if [[ "x$JAVA_HOME_8" = "x" ]]; then
+    exitWithMsg "variable JAVA_HOME_8 not set: e.g. \"export JAVA_HOME_8=/usr/Java/oracle/jdk1.8.0_181\""
+fi
+if [[ "x$JAVA_HOME_11" = "x" ]]; then
+    exitWithMsg "variable JAVA_HOME_11 not set: e.g. \"export JAVA_HOME_11=/usr/Java/openjdk/jdk-11.0.2\""
+fi
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
@@ -218,13 +243,14 @@ fi
 # ========================
 # Profile
 # ========================
-export WLF_CLI_SCRIPT1=configuration1.cli
-export WLF_CLI_SCRIPT2=configuration2.cli
-export JDG_CLI_SCRIPT=configuration-jdg.cli
+export WLF_CLI_SCRIPT1=wildfly.cli
+export WLF_CLI_SCRIPT2=wildfly.cli
+export JDG_CLI_SCRIPT=jdg.cli
 export MVN_PROFILE="-q"
 export WAR_FINAL_NAME=clusterbench.war
-export WAR_CONTEXT_PATH=clusterbench1
-echo -e "${GREEN}\n=======================================\nUsing WLF_CLI_SCRIPT $WLF_CLI_SCRIPT1 and $WLF_CLI_SCRIPT2\nUsing WAR_FINAL_NAME $WAR_FINAL_NAME\nUsing WAR_CONTEXT_PATH $WAR_CONTEXT_PATH\nUsing JDG_CLI_SCRIPT $JDG_CLI_SCRIPT\n=======================================\n${NC}"
+export WAR_CONTEXT_PATH1=clusterbench1
+export WAR_CONTEXT_PATH2=clusterbench2
+echo -e "${GREEN}\n=======================================\nUsing WLF_CLI_SCRIPT $WLF_CLI_SCRIPT1 and $WLF_CLI_SCRIPT2\nUsing WAR_FINAL_NAME $WAR_FINAL_NAME\nUsing WAR_CONTEXT_PATH $WAR_CONTEXT_PATH1 and $WAR_CONTEXT_PATH2\nUsing JDG_CLI_SCRIPT $JDG_CLI_SCRIPT\n=======================================\n${NC}"
 
 mkdir -p $WLF_DIRECTORY
 
@@ -260,7 +286,7 @@ startJDG1
 sleep 2
 
 startJDG2
-sleep 5
+sleep 15
 
 startWFL1
 sleep 2
@@ -270,4 +296,4 @@ sleep 5
 
 deployToWildFly
 
-exitWithMsg "paste \"http://localhost:8180/$WAR_CONTEXT_PATH/session\" or \"http://localhost:8280/$WAR_CONTEXT_PATH/session\" in your browser ..."
+exitWithMsg "paste \"http://localhost:8180/$WAR_CONTEXT_PATH1/session\" or \"http://localhost:8280/$WAR_CONTEXT_PATH1/session\" \"http://localhost:8180/$WAR_CONTEXT_PATH2/session\" or \"http://localhost:8280/$WAR_CONTEXT_PATH2/session\" in your browser ..."

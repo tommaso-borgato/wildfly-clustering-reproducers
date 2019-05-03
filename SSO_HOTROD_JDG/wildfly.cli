@@ -1,0 +1,39 @@
+embed-server --std-out=echo --server-config=standalone-ha.xml
+# ============================
+# sso
+# ============================
+/subsystem=elytron/filesystem-realm=sso:add(path=sso-ream, relative-to=jboss.server.data.dir)
+/subsystem=elytron/filesystem-realm=sso:add-identity(identity=alice)
+/subsystem=elytron/filesystem-realm=sso:add-identity-attribute(identity=alice, name=groups, value=[Users])
+/subsystem=elytron/filesystem-realm=sso:set-password(identity=alice, clear={password=alice})
+/subsystem=elytron/security-domain=sso:add(default-realm=sso, permission-mapper=default-permission-mapper,realms=[{realm=sso, role-decoder=groups-to-roles}])
+#/subsystem=elytron/http-authentication-factory=sso:add(security-domain=sso, http-server-mechanism-factory=global, mechanism-configurations=[{mechanism-name=FORM},{mechanism-name=BASIC}])
+/subsystem=elytron/http-authentication-factory=sso:add(security-domain=sso, http-server-mechanism-factory=global, mechanism-configurations=[{mechanism-name=FORM}])
+/subsystem=undertow/application-security-domain=other:add(http-authentication-factory=sso)
+/subsystem=elytron/key-store=sso:add(path=keystore.jks, relative-to=jboss.server.config.dir, credential-reference={clear-text=secret}, type=JKS)
+/subsystem=undertow/application-security-domain=other/setting=single-sign-on:add(key-store=sso, key-alias=localhost, credential-reference={clear-text=secret})
+# ============================
+# hotrod
+# ============================
+batch
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-1:add(port=11522,host=127.0.0.1)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-2:add(port=11622,host=127.0.0.1)
+/subsystem=infinispan/remote-cache-container=web:add(default-remote-cluster=infinispan-server-cluster, module=org.wildfly.clustering.web.hotrod)
+/subsystem=infinispan/remote-cache-container=web/remote-cluster=infinispan-server-cluster:add(socket-bindings=[infinispan-server-1,infinispan-server-2])
+/subsystem=infinispan/remote-cache-container=web/near-cache=invalidation:add(max-entries=1000)
+run-batch
+# ============================
+# hotrod + sso
+# ============================
+/subsystem=distributable-web/hotrod-single-sign-on-management=other:add(remote-cache-container=web)
+/subsystem=distributable-web:write-attribute(name=default-single-sign-on-management, value=other)
+# ============================
+# log
+# ============================
+/subsystem=logging/logger=org.jboss.security:add(level=ALL)
+/subsystem=logging/logger=org.jboss.as.security:add(level=ALL)
+/subsystem=logging/logger=org.picketbox:add(level=ALL)
+/subsystem=logging/logger=org.jboss.as.domain.management.security:add(level=ALL)
+/subsystem=logging/logger=org.wildfly.security:add(level=ALL)
+/subsystem=logging/logger=org.wildfly.elytron:add(level=ALL)
+/subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=ALL)

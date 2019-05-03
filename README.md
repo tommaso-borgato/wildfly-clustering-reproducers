@@ -49,3 +49,7 @@ a Singleton Deployment WAR is deployed to the 4 nodes and some HTTP requests are
 
 Demonstrates using SSO with an application deployed on 2 nodes cluster
 
+### SSO HOTROD JDG 
+
+Demonstrates using SSO with an application deployed on 2 nodes cluster; SSO data is offloaded to a remote Infinispan cluster through HotRod;
+

@@ -1,0 +1,27 @@
+embed-server --std-out=echo --server-config=standalone-ha.xml
+# ======================================================================================================================
+# sockets to Infinispan cluster
+# ======================================================================================================================
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-1:add(host=127.0.0.1,port=11522)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-2:add(host=127.0.0.1,port=11622)
+# ======================================================================================================================
+# remote-cache-container that references the newly created socket bindings
+# ======================================================================================================================
+batch
+/subsystem=infinispan/remote-cache-container=jdg_cache_container:add(default-remote-cluster=infinispan-server-cluster, module=org.wildfly.clustering.web.hotrod)
+/subsystem=infinispan/remote-cache-container=jdg_cache_container/remote-cluster=infinispan-server-cluster:add(socket-bindings=[infinispan-server-1,infinispan-server-2])
+run-batch
+# ======================================================================================================================
+#  HotRod store uses one dedicated remote cache for each cache created by the JBoss EAP server (typically, one invalidation cache)
+# ======================================================================================================================
+batch
+/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache:add()
+/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache/store=hotrod:add(remote-cache-container=jdg_cache_container, fetch-state=false, purge=false, passivation=false, shared=true)
+/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache/component=transaction:add(mode=BATCH)
+/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache/component=locking:add(isolation=REPEATABLE_READ)
+/subsystem=infinispan/cache-container=web:write-attribute(name=default-cache,value=jdg_cache)
+run-batch
+# ======================================================================================================================
+# for transactions
+# ======================================================================================================================
+/subsystem=transactions:write-attribute(name=node-identifier,value=_NODE_IDENTIFIER_)

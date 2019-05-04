@@ -1,0 +1,12 @@
+embed-server --std-out=echo --server-config=clustered.xml
+/subsystem=logging/console-handler=CONSOLE:write-attribute(name=level,value=TRACE)
+/subsystem=logging/logger=org.infinispan.container.EntryFactoryImpl:add(category=org.infinispan.container.EntryFactoryImpl,level=TRACE)
+/subsystem=logging/logger=org.infinispan.container.EntryFactoryImpl:add-handler(name=CONSOLE)
+/subsystem=transactions:write-attribute(name=node-identifier,value=_NODE_IDENTIFIER_)
+/subsystem=datagrid-infinispan/cache-container=clustered/distributed-cache=distributed-webapp.war:add(configuration=transactional)
+## Copy the keystore used in the client-ssl-context to the remote JBoss Data Grid instance
+/core-service=management/security-realm=ApplicationRealm/server-identity=ssl:remove()
+/core-service=management/security-realm=ApplicationRealm/server-identity=ssl:add(keystore-path=wfl.keystore.jks,keystore-relative-to="jboss.server.config.dir",keystore-password=secret)
+/subsystem=datagrid-infinispan-endpoint/hotrod-connector=hotrod-connector/encryption=ENCRYPTION:add(require-ssl-client-auth=false,security-realm="ApplicationRealm")
+
+

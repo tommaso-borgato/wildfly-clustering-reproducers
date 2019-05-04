@@ -1,0 +1,49 @@
+embed-server --std-out=echo --server-config=standalone-ha.xml
+# ======================================================================================================================
+# sockets to Infinispan cluster
+# ======================================================================================================================
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-1:add(host=127.0.0.1,port=11522)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-2:add(host=127.0.0.1,port=11622)
+# ======================================================================================================================
+# remote-cache-container that references the newly created socket bindings
+# ======================================================================================================================
+batch
+/subsystem=infinispan/remote-cache-container=jdg_cache_container:add(default-remote-cluster=infinispan-server-cluster, module=org.wildfly.clustering.web.hotrod)
+/subsystem=infinispan/remote-cache-container=jdg_cache_container/remote-cluster=infinispan-server-cluster:add(socket-bindings=[infinispan-server-1,infinispan-server-2])
+run-batch
+# ======================================================================================================================
+# HotRod store uses one dedicated remote cache for each cache created by the JBoss EAP server (typically, one invalidation cache)
+# ======================================================================================================================
+batch
+/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache:add()
+/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache/store=hotrod:add(remote-cache-container=jdg_cache_container, fetch-state=false, purge=false, passivation=false, shared=true)
+/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache/component=transaction:add(mode=BATCH)
+/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache/component=locking:add(isolation=REPEATABLE_READ)
+/subsystem=infinispan/cache-container=web:write-attribute(name=default-cache,value=jdg_cache)
+run-batch
+# ======================================================================================================================
+# for transactions
+# ======================================================================================================================
+/subsystem=transactions:write-attribute(name=node-identifier,value=_NODE_IDENTIFIER_)
+# ======================================================================================================================
+# see https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.2/html-single/configuration_guide/index#jdg_externalize_http_sessions
+# A client-ssl-context is used for providing an SSL context when the JBoss EAP instance creates an SSL connection as a client, such as using SSL in remoting.
+# ======================================================================================================================
+## Enable two-way SSL/TLS using the elytron subsystem
+### keystore
+/subsystem=elytron/key-store=twoWayKS:add(path=wfl.keystore.jks,relative-to=jboss.server.config.dir,credential-reference={clear-text=secret},type=JKS)
+### keystore for the server truststore and import the client certificate into the server truststore
+/subsystem=elytron/key-store=twoWayTS:add(path=wfl.truststore.jks,relative-to=jboss.server.config.dir,credential-reference={clear-text=secret},type=JKS)
+### key-manager that references your keystore key-store.
+/subsystem=elytron/key-manager=twoWayKM:add(key-store=twoWayKS, algorithm="SunX509", credential-reference={clear-text=secret})
+### trust-manager that references your truststore key-store.
+/subsystem=elytron/trust-manager=twoWayTM:add(key-store=twoWayTS, algorithm="SunX509")
+### server-ssl-context that references your key-manager, trust-manager, and enables client authentication:
+/subsystem=elytron/server-ssl-context=twoWaySSC:add(key-manager=twoWayKM, protocols=["TLSv1.2"], trust-manager=twoWayTM, need-client-auth=true)
+### Remove the reference to the legacy security realm, and update the https-listener to use the ssl-context from Elytron
+batch
+/subsystem=undertow/server=default-server/https-listener=https:undefine-attribute(name=security-realm)
+/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name=ssl-context, value=twoWaySSC)
+run-batch
+/subsystem=elytron/client-ssl-context=CLIENT_SSL_CONTEXT:add(key-manager=twoWayKM, trust-manager=twoWayTM, protocols=["TLSv1.2"])
+/subsystem=infinispan/remote-cache-container=jdg_cache_container/component=security:write-attribute(name=ssl-context,value=CLIENT_SSL_CONTEXT)

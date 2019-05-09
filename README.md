@@ -35,6 +35,11 @@ Demonstrates how to run a 2 nodes WildFly cluster using an invalidation cache fo
 
 > NOTE: Uses the traditional WildFLy Infinispan session manager to connect to the remote Infinispan Server cluster.
 
+### JDG-ENCRYPTED
+
+Demonstrates how to run a 2 nodes WildFly cluster using an invalidation cache for webapps, backed by a 2 nodes Infinispan Server cluster.
+The communication between WildFLy and Infinispan is encrypted.
+
 ### SHARED SESSIONS
 
 Demonstrates how to run an EAR containing 2 WAR files sharing HTTP sessions, on a 4 nodes WildFly cluster;

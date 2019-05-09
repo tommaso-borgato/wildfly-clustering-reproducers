@@ -6,7 +6,7 @@ embed-server --std-out=echo --server-config=clustered.xml
 /subsystem=datagrid-infinispan/cache-container=clustered/distributed-cache=distributed-webapp.war:add(configuration=transactional)
 ## Copy the keystore used in the client-ssl-context to the remote JBoss Data Grid instance
 /core-service=management/security-realm=ApplicationRealm/server-identity=ssl:remove()
-/core-service=management/security-realm=ApplicationRealm/server-identity=ssl:add(keystore-path=wfl.keystore.jks,keystore-relative-to="jboss.server.config.dir",keystore-password=secret)
+/core-service=management/security-realm=ApplicationRealm/server-identity=ssl:add(keystore-path=wfl.keystore.jks,keystore-relative-to="jboss.home.dir",keystore-password=secret)
 /subsystem=datagrid-infinispan-endpoint/hotrod-connector=hotrod-connector/encryption=ENCRYPTION:add(require-ssl-client-auth=false,security-realm="ApplicationRealm")
 
 

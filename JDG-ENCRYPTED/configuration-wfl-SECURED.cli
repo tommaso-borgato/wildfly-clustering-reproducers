@@ -2,24 +2,24 @@ embed-server --std-out=echo --server-config=standalone-ha.xml
 # ======================================================================================================================
 # sockets to Infinispan cluster
 # ======================================================================================================================
-/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-1:add(host=127.0.0.1,port=11522)
-/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-2:add(host=127.0.0.1,port=11622)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-jdg-server-1:add(host=127.0.0.1,port=11522)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-jdg-server-2:add(host=127.0.0.1,port=11622)
 # ======================================================================================================================
 # remote-cache-container that references the newly created socket bindings
 # ======================================================================================================================
 batch
-/subsystem=infinispan/remote-cache-container=jdg_cache_container:add(default-remote-cluster=infinispan-server-cluster, module=org.wildfly.clustering.web.hotrod)
-/subsystem=infinispan/remote-cache-container=jdg_cache_container/remote-cluster=infinispan-server-cluster:add(socket-bindings=[infinispan-server-1,infinispan-server-2])
+/subsystem=infinispan/remote-cache-container=web-sessions:add(default-remote-cluster=infinispan-server-cluster)
+/subsystem=infinispan/remote-cache-container=web-sessions/remote-cluster=infinispan-server-cluster:add(socket-bindings=[remote-jdg-server-1,remote-jdg-server-2])
 run-batch
 # ======================================================================================================================
 # HotRod store uses one dedicated remote cache for each cache created by the JBoss EAP server (typically, one invalidation cache)
 # ======================================================================================================================
 batch
-/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache:add()
-/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache/store=hotrod:add(remote-cache-container=jdg_cache_container, fetch-state=false, purge=false, passivation=false, shared=true)
-/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache/component=transaction:add(mode=BATCH)
-/subsystem=infinispan/cache-container=web/invalidation-cache=jdg_cache/component=locking:add(isolation=REPEATABLE_READ)
-/subsystem=infinispan/cache-container=web:write-attribute(name=default-cache,value=jdg_cache)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload:add()
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=hotrod:add(remote-cache-container=web-sessions, fetch-state=false, purge=false, passivation=false, shared=true)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=transaction:add(mode=BATCH)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=locking:add(isolation=REPEATABLE_READ)
+/subsystem=infinispan/cache-container=web:write-attribute(name=default-cache, value=offload)
 run-batch
 # ======================================================================================================================
 # for transactions
@@ -31,9 +31,9 @@ run-batch
 # ======================================================================================================================
 ## Enable two-way SSL/TLS using the elytron subsystem
 ### keystore
-/subsystem=elytron/key-store=twoWayKS:add(path=wfl.keystore.jks,relative-to=jboss.server.config.dir,credential-reference={clear-text=secret},type=JKS)
+/subsystem=elytron/key-store=twoWayKS:add(path=wfl.keystore.jks,relative-to=jboss.home.dir,credential-reference={clear-text=secret},type=JKS)
 ### keystore for the server truststore and import the client certificate into the server truststore
-/subsystem=elytron/key-store=twoWayTS:add(path=wfl.truststore.jks,relative-to=jboss.server.config.dir,credential-reference={clear-text=secret},type=JKS)
+/subsystem=elytron/key-store=twoWayTS:add(path=wfl.truststore.jks,relative-to=jboss.home.dir,credential-reference={clear-text=secret},type=JKS)
 ### key-manager that references your keystore key-store.
 /subsystem=elytron/key-manager=twoWayKM:add(key-store=twoWayKS, algorithm="SunX509", credential-reference={clear-text=secret})
 ### trust-manager that references your truststore key-store.
@@ -46,4 +46,4 @@ batch
 /subsystem=undertow/server=default-server/https-listener=https:write-attribute(name=ssl-context, value=twoWaySSC)
 run-batch
 /subsystem=elytron/client-ssl-context=CLIENT_SSL_CONTEXT:add(key-manager=twoWayKM, trust-manager=twoWayTM, protocols=["TLSv1.2"])
-/subsystem=infinispan/remote-cache-container=jdg_cache_container/component=security:write-attribute(name=ssl-context,value=CLIENT_SSL_CONTEXT)
+/subsystem=infinispan/remote-cache-container=web-sessions/component=security:write-attribute(name=ssl-context,value=CLIENT_SSL_CONTEXT)

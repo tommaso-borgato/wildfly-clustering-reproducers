@@ -152,13 +152,13 @@ configureSshKeys(){
   ## import the server certificate into the client truststore
   keytool -importcert -keystore $BASE_DIRECTORY/wfl.truststore.jks -storepass secret -alias localhost -trustcacerts -file $BASE_DIRECTORY/wfl.cer -noprompt
 
-  cp $BASE_DIRECTORY/wfl.keystore.jks $BASE_DIRECTORY/WFL1/standalone/configuration/wfl.keystore.jks
-  cp $BASE_DIRECTORY/wfl.keystore.jks $BASE_DIRECTORY/WFL2/standalone/configuration/wfl.keystore.jks
-  cp $BASE_DIRECTORY/wfl.truststore.jks $BASE_DIRECTORY/WFL1/standalone/configuration/wfl.truststore.jks
-  cp $BASE_DIRECTORY/wfl.truststore.jks $BASE_DIRECTORY/WFL2/standalone/configuration/wfl.truststore.jks
+  cp $BASE_DIRECTORY/wfl.keystore.jks $BASE_DIRECTORY/WFL1/wfl.keystore.jks
+  cp $BASE_DIRECTORY/wfl.keystore.jks $BASE_DIRECTORY/WFL2/wfl.keystore.jks
+  cp $BASE_DIRECTORY/wfl.truststore.jks $BASE_DIRECTORY/WFL1/wfl.truststore.jks
+  cp $BASE_DIRECTORY/wfl.truststore.jks $BASE_DIRECTORY/WFL2/wfl.truststore.jks
 
-  cp $BASE_DIRECTORY/wfl.keystore.jks $BASE_DIRECTORY/JDG1/standalone/configuration/wfl.keystore.jks
-  cp $BASE_DIRECTORY/wfl.keystore.jks $BASE_DIRECTORY/JDG2/standalone/configuration/wfl.keystore.jks
+  cp $BASE_DIRECTORY/wfl.keystore.jks $BASE_DIRECTORY/JDG1/wfl.keystore.jks
+  cp $BASE_DIRECTORY/wfl.keystore.jks $BASE_DIRECTORY/JDG2/wfl.keystore.jks
 }
 
 configureWildFly(){

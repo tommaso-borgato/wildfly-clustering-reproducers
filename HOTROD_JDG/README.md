@@ -1,16 +1,51 @@
 # HOTROD SESSION MANAGEMENT
 
 Demonstrates how to run a 2 nodes WildFly cluster using an remote cache for webapps, backed by a 2 nodes Infinispan Server cluster.
-The peculiarity of this configuration is that a particular HotRod session manager is used (added in [WFLY-7719](https://issues.jboss.org/browse/WFLY-7719));
+The peculiarity of this configuration is that a particular HotRod session manager is used;
 This HotRod session manager talks directly to the Infinispan Server cluster through HotRod client.
 
-The cache used by WildFly distributable web app is totally handled by a remote JDG cluster.
+> NOTE: You have to use Infinispan Server newer or equal to [infinispan-server-10.0.0](http://downloads.jboss.org/infinispan/10.0.0.Beta3/infinispan-server-10.0.0.Beta3.zip)
 
-> NOTE: You have to use Java 8 for this reproducer because of Infinispan Server
+## Intro
 
-You have two options here:
+A new new distributed session manager implementation `org.wildfly.clustering.web.hotrod.session.HotRodSessionManager` has been added to WildFly
+(see [WFLY-7719](https://issues.jboss.org/browse/WFLY-7719)).
 
-1. L1 cache: maintain a copy of the entries in the remote JDG cluster, in `invalidation-near-cache` in every WildFly node: the so called L1 cache
+This HotRod session manager talks directly to the Infinispan Server cluster through the HotRod client (`org.infinispan:infinispan-client-hotrod`)
+provided by Infinispan.
+
+With this new session manager it's possible to offload session data (or/and sso data) without even caching a copy on the WildFLy node.
+
+Two new configurations elements have been added to the `distributable-web` element:
+
+ * `hotrod-session-management`
+ * `hotrod-single-sign-on-management`
+
+Here is the updated list of options we have now in the `distributable-web` element:
+
+```
+<subsystem xmlns="urn:jboss:domain:distributable-web:1.0" default-session-management="session" default-single-sign-on-management="default">
+    <infinispan-session-management name="session" cache-container="foo" granularity="SESSION">
+        <primary-owner-affinity/>
+    </infinispan-session-management>
+    <infinispan-session-management name="attribute" cache-container="foo" cache="bar" granularity="ATTRIBUTE">
+        <local-affinity/>
+    </infinispan-session-management>
+    <hotrod-session-management name="remote" remote-cache-container="foo" granularity="ATTRIBUTE">
+        <no-affinity/>
+    </hotrod-session-management>
+    <infinispan-single-sign-on-management name="default" cache-container="foo"/>
+    <infinispan-single-sign-on-management name="domain" cache-container="foo" cache="bar"/>
+    <hotrod-single-sign-on-management name="remote" remote-cache-container="foo"/>
+    <infinispan-routing cache-container="web" cache="routing"/>
+</subsystem>
+```
+
+## Cache on WildFly
+
+You have two options for the WildFly cache (`remote-cache-container` attribute):
+
+1. L1 cache: maintain a copy of the entries off-loaded to the remote JDG cluster; an `invalidation-near-cache` is used on each WildFly node: the so called L1 cache
 2. NO L1 cache
 
 > NOTE: Option "2. NO L1 cache" is NOT recommended 

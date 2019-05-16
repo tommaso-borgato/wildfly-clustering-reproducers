@@ -155,10 +155,18 @@ configureJdg(){
   export JAVA_HOME=$JAVA_HOME_8
   cat $JDG_CLI_SCRIPT_TMP_1
   cp -f $JDG_DIRECTORY/JDG1/standalone/configuration/clustered.xml $JDG_DIRECTORY/JDG1/standalone/configuration/clustered.xml.ORIG
-  $JDG_DIRECTORY/JDG1/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_1
+  if test -f "$JDG_DIRECTORY/JDG1/bin/ispn-cli.sh"; then
+    $JDG_DIRECTORY/JDG1/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_1
+  else
+    $JDG_DIRECTORY/JDG1/bin/cli.sh --file=$JDG_CLI_SCRIPT_TMP_1
+  fi
   cat $JDG_CLI_SCRIPT_TMP_2
   cp -f $JDG_DIRECTORY/JDG2/standalone/configuration/clustered.xml $JDG_DIRECTORY/JDG2/standalone/configuration/clustered.xml.ORIG
-  $JDG_DIRECTORY/JDG2/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_2
+  if test -f "$JDG_DIRECTORY/JDG2/bin/ispn-cli.sh"; then
+    $JDG_DIRECTORY/JDG2/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_2
+  else
+    $JDG_DIRECTORY/JDG2/bin/cli.sh --file=$JDG_CLI_SCRIPT_TMP_2
+  fi
 }
 
 configureWildFly(){
@@ -212,11 +220,14 @@ exitWithMsg(){
 # ================
 # START
 # ================
+if [[ "x$JAVA_HOME" = "x" ]]; then
+    exitWithMsg "variable JAVA_HOME not set: e.g. \"export JAVA_HOME_11=/usr/Java/openjdk/jdk-11.0.2\""
+fi
 if [[ "x$JAVA_HOME_8" = "x" ]]; then
-    exitWithMsg "variable JAVA_HOME_8 not set: e.g. \"export JAVA_HOME_8=/usr/Java/oracle/jdk1.8.0_181\""
+    export JAVA_HOME_8=$JAVA_HOME
 fi
 if [[ "x$JAVA_HOME_11" = "x" ]]; then
-    exitWithMsg "variable JAVA_HOME_11 not set: e.g. \"export JAVA_HOME_11=/usr/Java/openjdk/jdk-11.0.2\""
+    export JAVA_HOME_11=$JAVA_HOME
 fi
 RED='\033[0;31m'
 GREEN='\033[0;32m'

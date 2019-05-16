@@ -10,7 +10,42 @@ This way you can just authenticate once to the the whole cluster;
 
 See [Web_Single_Sign_On](https://docs.wildfly.org/16/WildFly_Elytron_Security.html#Web_Single_Sign_On).
 
-> NOTE: You need to use Java 8 for the Infinispan cluster (see `run script` below)
+> NOTE: You have to use Infinispan Server newer or equal to [infinispan-server-10.0.0](http://downloads.jboss.org/infinispan/10.0.0.Beta3/infinispan-server-10.0.0.Beta3.zip)
+
+## Intro
+
+A new new distributed session manager implementation `org.wildfly.clustering.web.hotrod.session.HotRodSessionManager` has been added to WildFly
+(see [WFLY-7719](https://issues.jboss.org/browse/WFLY-7719)).
+
+This HotRod session manager talks directly to the Infinispan Server cluster through the HotRod client (`org.infinispan:infinispan-client-hotrod`)
+provided by Infinispan.
+
+With this new session manager it's possible to offload sso data (or/and session data) without even caching a copy on the WildFLy node.
+
+Two new configurations elements have been added to the `distributable-web` element:
+
+ * `hotrod-session-management`
+ * `hotrod-single-sign-on-management`
+
+Here is the updated list of options we have now in the `distributable-web` element:
+
+```
+<subsystem xmlns="urn:jboss:domain:distributable-web:1.0" default-session-management="session" default-single-sign-on-management="default">
+    <infinispan-session-management name="session" cache-container="foo" granularity="SESSION">
+        <primary-owner-affinity/>
+    </infinispan-session-management>
+    <infinispan-session-management name="attribute" cache-container="foo" cache="bar" granularity="ATTRIBUTE">
+        <local-affinity/>
+    </infinispan-session-management>
+    <hotrod-session-management name="remote" remote-cache-container="foo" granularity="ATTRIBUTE">
+        <no-affinity/>
+    </hotrod-session-management>
+    <infinispan-single-sign-on-management name="default" cache-container="foo"/>
+    <infinispan-single-sign-on-management name="domain" cache-container="foo" cache="bar"/>
+    <hotrod-single-sign-on-management name="remote" remote-cache-container="foo"/>
+    <infinispan-routing cache-container="web" cache="routing"/>
+</subsystem>
+```
 
 ## Steps
 
@@ -19,16 +54,11 @@ See [Web_Single_Sign_On](https://docs.wildfly.org/16/WildFly_Elytron_Security.ht
   sudo yum install gnome-terminal
   ```
 - download WildFly (e.g. [wildfly-16.0.0.Final.zip](https://download.jboss.org/wildfly/16.0.0.Beta1/wildfly-16.0.0.Final.zip)) to some folder on your PC (e.g. `/some-folder/wildfly-16.0.0.Final.zip`)
-- download infinispan-server (e.g. [infinispan-server-9.4.6.Final.zip](http://downloads.jboss.org/infinispan/9.4.6.Final/infinispan-server-9.4.6.Final.zip)) to some folder on your PC (e.g. `/some-folder/infinispan-server-9.4.6.Final.zip`)
+- download infinispan-server (e.g. [infinispan-server-10.0.0.Beta3.zip](http://downloads.jboss.org/infinispan/10.0.0.Beta3/infinispan-server-10.0.0.Beta3.zip)) to some folder on your PC (e.g. `/some-folder/infinispan-server-9.4.6.Final.zip`)
 - run script:
-  ```  
-  # Java 8 is used for Infinispan
-  export JAVA_HOME_8=/usr/Java/oracle/jdk1.8.0_181
-  # Java 11 i used for WildFly
-  export JAVA_HOME_11=/usr/Java/openjdk/jdk-11.0.2
-  
+  ```    
   export WLF_ZIP=/some-folder/wildfly-16.0.0.Final.zip
-  export JDG_ZIP=/some-folder/infinispan-server-9.4.6.Final.zip
+  export JDG_ZIP=/some-folder/infinispan-server-10.0.0.Beta3.zip
   
   start-all.sh
   ```

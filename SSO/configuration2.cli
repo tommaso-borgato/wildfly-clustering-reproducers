@@ -3,7 +3,7 @@ embed-server --std-out=echo --server-config=standalone-ha.xml
 ## realm
 /subsystem=elytron/filesystem-realm=clustering-realm:add(path=/tmp/clustering-realm-2)
 ## domain --> realm
-/subsystem=elytron/security-domain=clustering-domain:add(default-realm=clustering-realm, permission-mapper=default-permission-mapper,realms=[{realm=clustering-realm, role-decoder=groups-to-roles}]
+/subsystem=elytron/security-domain=clustering-domain:add(default-realm=clustering-realm, permission-mapper=default-permission-mapper,realms=[{realm=clustering-realm, role-decoder=groups-to-roles}])
 ## user
 /subsystem=elytron/filesystem-realm=clustering-realm:add-identity(identity=alice)
 /subsystem=elytron/filesystem-realm=clustering-realm:set-password(identity=alice, clear={password=alice})

@@ -6,7 +6,7 @@ startWFL1(){
   echo "STARTING WFL1"
   echo $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
   echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL1 --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1
+  gnome-terminal --geometry=140x35 --window --zoom=0.9 --working-directory=$WLF_DIRECTORY/WFL1 --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
 }
 
 startWFL2(){
@@ -15,16 +15,16 @@ startWFL2(){
   echo "STARTING WFL2"
   echo $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
   echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=100
+  gnome-terminal --geometry=140x35 --window --zoom=0.9 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
 }
 
 startWFLLB(){
   echo ''
   echo '======================================='
-  echo "STARTING WFL2"
+  echo "STARTING LOAD BALANCER"
   echo $WLF_DIRECTORY/WFL3/bin/standalone.sh --server-config=standalone-load-balancer.xml
   echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL3 --title="WFL3" -- $WLF_DIRECTORY/WFL3/bin/standalone.sh --server-config=standalone-load-balancer.xml
+  gnome-terminal --geometry=140x35 --window --zoom=0.9 --working-directory=$WLF_DIRECTORY/WFL3 --title="LOAD BALANCER" -- $WLF_DIRECTORY/WFL3/bin/standalone.sh --server-config=standalone-load-balancer.xml
 }
 
 addUsersWildFly(){
@@ -32,13 +32,9 @@ addUsersWildFly(){
   echo '======================================='
   echo 'ADDING USERS TO WILDFLY'
   echo '======================================='
-  $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013!
-  $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -a -g users -u joe -p joeIsAwesome2013!
   $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL3/bin/add-user.sh --silent -u admin -p admin123+
-  $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -a -u ejb -p test
-  $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -a -u ejb -p test
   sleep 2
 }
 
@@ -111,11 +107,9 @@ deployToWildFly(){
   cd distributed-webapp
   mvn $MVN_PROFILE clean install
   cd -
-  cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/clusterbench1.war
-  cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/clusterbench2.war
+  cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/distributed-webapp.war
   sleep 2
-  cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/clusterbench1.war
-  cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/clusterbench2.war
+  cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/distributed-webapp.war
   sleep 2
 }
 
@@ -158,7 +152,7 @@ export WLF_CLI_SCRIPT1=configuration.cli
 export WLF_CLI_SCRIPT2=configuration.cli
 export WLF_CLI_SCRIPT3=configuration-lb.cli
 export MVN_PROFILE="-q"
-export WAR_FINAL_NAME=clusterbench.war
+export WAR_FINAL_NAME=distributed-webapp.war
 export WAR_CONTEXT_PATH=clusterbench
 echo -e "${GREEN}\n=======================================\nUsing WLF_CLI_SCRIPT $WLF_CLI_SCRIPT1 and $WLF_CLI_SCRIPT2\nUsing WAR_FINAL_NAME $WAR_FINAL_NAME\nUsing WAR_CONTEXT_PATH $WAR_CONTEXT_PATH\nUsing JDG_CLI_SCRIPT $JDG_CLI_SCRIPT\n=======================================\n${NC}"
 
@@ -186,6 +180,9 @@ sleep 1
 configureWildFly
 sleep 1
 
+startWFLLB
+sleep 5
+
 startWFL1
 sleep 5
 
@@ -195,7 +192,7 @@ sleep 5
 deployToWildFly
 sleep 5
 
-startWFLLB
-sleep 2
+#startWFLLB
+#sleep 2
 
 exitWithMsg "paste \"http://localhost:8180/$WAR_CONTEXT_PATH/session\" or \"http://localhost:8280/$WAR_CONTEXT_PATH/session\" in your browser ..."

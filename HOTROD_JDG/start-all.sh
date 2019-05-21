@@ -41,12 +41,10 @@ addUsersJdg(){
   echo '======================================='
   echo 'ADDING USERS TO JDG'
   echo '======================================='
-  $WLF_DIRECTORY/JDG1/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
-  $WLF_DIRECTORY/JDG2/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
-  $WLF_DIRECTORY/JDG1/bin/add-user.sh -u admin -p admin123+
-  $WLF_DIRECTORY/JDG2/bin/add-user.sh -u admin -p admin123+
-  $WLF_DIRECTORY/JDG1/bin/add-user.sh -a -u ejb -p test
-  $WLF_DIRECTORY/JDG2/bin/add-user.sh -a -u ejb -p test
+  #$WLF_DIRECTORY/JDG1/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
+  #$WLF_DIRECTORY/JDG2/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
+  $WLF_DIRECTORY/JDG1/bin/add-user.sh --silent -u admin -p admin123+
+  $WLF_DIRECTORY/JDG2/bin/add-user.sh --silent -u admin -p admin123+
 }
 
 addUsersWildFly(){
@@ -54,12 +52,10 @@ addUsersWildFly(){
   echo '======================================='
   echo 'ADDING USERS TO WILDFLY'
   echo '======================================='
-  $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
-  $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
-  $WLF_DIRECTORY/WFL1/bin/add-user.sh -u admin -p admin123+
-  $WLF_DIRECTORY/WFL2/bin/add-user.sh -u admin -p admin123+
-  $WLF_DIRECTORY/WFL1/bin/add-user.sh -a -u ejb -p test
-  $WLF_DIRECTORY/WFL2/bin/add-user.sh -a -u ejb -p test
+  #$WLF_DIRECTORY/WFL1/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
+  #$WLF_DIRECTORY/WFL2/bin/add-user.sh -a -g users -u joe -p joeIsAwesome2013!
+  $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -u admin -p admin123+
+  $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -u admin -p admin123+
 }
 
 downloadJdg() {
@@ -132,10 +128,18 @@ configureJdg(){
   sed -i "s/_NODE_IDENTIFIER_/JDG2/g" $JDG_CLI_SCRIPT_TMP_2
   echo '======================================='
   cat $JDG_CLI_SCRIPT_TMP_1
-  $JDG_DIRECTORY/JDG1/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_1
+  if test -f "$JDG_DIRECTORY/JDG1/bin/ispn-cli.sh"; then
+    $JDG_DIRECTORY/JDG1/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_1
+  else
+    $JDG_DIRECTORY/JDG1/bin/cli.sh --file=$JDG_CLI_SCRIPT_TMP_1
+  fi
   sleep 2
   cat $JDG_CLI_SCRIPT_TMP_2
-  $JDG_DIRECTORY/JDG2/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_2
+  if test -f "$JDG_DIRECTORY/JDG2/bin/ispn-cli.sh"; then
+    $JDG_DIRECTORY/JDG2/bin/ispn-cli.sh --file=$JDG_CLI_SCRIPT_TMP_2
+  else
+    $JDG_DIRECTORY/JDG2/bin/cli.sh --file=$JDG_CLI_SCRIPT_TMP_2
+  fi
   sleep 2
 }
 
@@ -280,16 +284,16 @@ startJDG1
 sleep 5
 
 startJDG2
-sleep 20
+sleep 15
 
 startWFL1
 sleep 5
 
 startWFL2
-sleep 10
+sleep 5
 
 deployToWildFly
-sleep 10
+sleep 5
 
 echo ''
 first_print=true

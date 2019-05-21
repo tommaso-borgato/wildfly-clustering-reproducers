@@ -4,6 +4,16 @@ Demonstrates how to run a 2 nodes WildFly cluster using an remote cache for weba
 The peculiarity of this configuration is that a particular HotRod session manager is used;
 This HotRod session manager talks directly to the Infinispan Server cluster through HotRod client.
 
+The priority for determining the session-management configuration to use for <distributable/> applications is as follows:
+
+ * Use the legacy configuration from jboss-web.xml if it defines a <replication-config/>
+ * If a distributable-web deployment descriptor namespace was specified (either via distributable-web.xml or jboss-all.xml):
+ * Use the named configuration defined by the deployment descriptor
+ * Use the adhoc configuration defined by the deployment descriptor
+ * Use a session-management configuration whose name matches the name of the undertow server associated with the deployment, if one exists
+ * Otherwise use the configuration identified by the default-session-management.
+
+
 > NOTE: You have to use Infinispan Server newer or equal to [infinispan-server-10.0.0](http://downloads.jboss.org/infinispan/10.0.0.Beta3/infinispan-server-10.0.0.Beta3.zip)
 
 ## Intro

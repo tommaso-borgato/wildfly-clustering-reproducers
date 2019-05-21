@@ -2,10 +2,10 @@ embed-server --std-out=echo --server-config=standalone-ha.xml
 /socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-1:add(host=127.0.0.1,port=11522)
 /socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-2:add(host=127.0.0.1,port=11622)
 batch
-/subsystem=infinispan/remote-cache-container=datagrid-cc:add(default-remote-cluster=infinispan-server-cluster, module=org.wildfly.clustering.web.hotrod)
+/subsystem=infinispan/remote-cache-container=datagrid-cc:add(default-remote-cluster=infinispan-server-cluster, module=org.wildfly.clustering.web.hotrod, protocol-version=2.6)
 /subsystem=infinispan/remote-cache-container=datagrid-cc/remote-cluster=infinispan-server-cluster:add(socket-bindings=[infinispan-server-1,infinispan-server-2])
 /subsystem=infinispan/remote-cache-container=datagrid-cc/near-cache=invalidation:add(max-entries=1000)
-/subsystem=infinispan/remote-cache-container=datagrid-cc/component=transaction:add(mode=BATCH)
+#/subsystem=infinispan/remote-cache-container=datagrid-cc/component=transaction:add(mode=BATCH)
 run-batch
 /subsystem=distributable-web/hotrod-session-management=datagrid-sm:add(remote-cache-container=datagrid-cc, granularity=SESSION)
 /subsystem=distributable-web/hotrod-session-management=datagrid-sm/affinity=local:add()

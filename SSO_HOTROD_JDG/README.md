@@ -10,6 +10,12 @@ This way you can just authenticate once to the the whole cluster;
 
 See [Web_Single_Sign_On](https://docs.wildfly.org/16/WildFly_Elytron_Security.html#Web_Single_Sign_On).
 
+Keep in mind that the priority for determining the session-management configuration to use is as follows:
+
+ * For elytron-based SSO, use the single-sign-on-management configuration whose name matches the application-security-domain associated with the deployment, if one exists
+ * For undertow-based SSO, use the single-sign-on-management configuration whose name matches the name of the undertow host associated with the deployment, if one exists
+ * Otherwise, use the configuration identified by the default-single-sign-on-management.
+
 > NOTE: You have to use Infinispan Server newer or equal to [infinispan-server-10.0.0](http://downloads.jboss.org/infinispan/10.0.0.Beta3/infinispan-server-10.0.0.Beta3.zip)
 
 ## Intro

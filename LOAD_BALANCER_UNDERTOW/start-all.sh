@@ -18,13 +18,31 @@ startWFL2(){
   gnome-terminal --geometry=140x35 --window --zoom=0.9 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
 }
 
+startWFL3(){
+  echo ''
+  echo '======================================='
+  echo "STARTING WFL3"
+  echo $WLF_DIRECTORY/WFL3/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL3 -Djboss.node.name=WFL3 -Djboss.socket.binding.port-offset=300
+  echo '======================================='
+  gnome-terminal --geometry=140x35 --window --zoom=0.9 --working-directory=$WLF_DIRECTORY/WFL3 --title="WFL3" -- $WLF_DIRECTORY/WFL3/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL3 -Djboss.node.name=WFL3 -Djboss.socket.binding.port-offset=300
+}
+
+startWFL4(){
+  echo ''
+  echo '======================================='
+  echo "STARTING WFL4"
+  echo $WLF_DIRECTORY/WFL4/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL4 -Djboss.node.name=WFL4 -Djboss.socket.binding.port-offset=400
+  echo '======================================='
+  gnome-terminal --geometry=140x35 --window --zoom=0.9 --working-directory=$WLF_DIRECTORY/WFL4 --title="WFL4" -- $WLF_DIRECTORY/WFL4/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL4 -Djboss.node.name=WFL4 -Djboss.socket.binding.port-offset=400
+}
+
 startWFLLB(){
   echo ''
   echo '======================================='
   echo "STARTING LOAD BALANCER"
-  echo $WLF_DIRECTORY/WFL3/bin/standalone.sh --server-config=standalone-load-balancer.xml
+  echo $WLF_DIRECTORY/WFLLB/bin/standalone.sh --server-config=standalone-load-balancer.xml
   echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.9 --working-directory=$WLF_DIRECTORY/WFL3 --title="LOAD BALANCER" -- $WLF_DIRECTORY/WFL3/bin/standalone.sh --server-config=standalone-load-balancer.xml
+  gnome-terminal --geometry=140x35 --window --zoom=0.9 --working-directory=$WLF_DIRECTORY/WFLLB --title="LOAD BALANCER" -- $WLF_DIRECTORY/WFLLB/bin/standalone.sh --server-config=standalone-load-balancer.xml
 }
 
 addUsersWildFly(){
@@ -35,6 +53,8 @@ addUsersWildFly(){
   $WLF_DIRECTORY/WFL1/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL2/bin/add-user.sh --silent -u admin -p admin123+
   $WLF_DIRECTORY/WFL3/bin/add-user.sh --silent -u admin -p admin123+
+  $WLF_DIRECTORY/WFL4/bin/add-user.sh --silent -u admin -p admin123+
+  $WLF_DIRECTORY/WFLLB/bin/add-user.sh --silent -u admin -p admin123+
   sleep 2
 }
 
@@ -74,6 +94,24 @@ downloadWildFly(){
     mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFL3
     rm -fdr $WLF_DIRECTORY/tmp-wildfly
   fi
+  if [[ ! -d "$WLF_DIRECTORY/WFL4" ]] ; then
+    echo ''
+    echo '======================================='
+    echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL4"
+    echo '======================================='
+    unzip -d $WLF_DIRECTORY/tmp-wildfly $WLF_ZIP > /dev/null
+    mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFL4
+    rm -fdr $WLF_DIRECTORY/tmp-wildfly
+  fi
+  if [[ ! -d "$WLF_DIRECTORY/WFLLB" ]] ; then
+    echo ''
+    echo '======================================='
+    echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFLLB"
+    echo '======================================='
+    unzip -d $WLF_DIRECTORY/tmp-wildfly $WLF_ZIP > /dev/null
+    mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFLLB
+    rm -fdr $WLF_DIRECTORY/tmp-wildfly
+  fi
 }
 
 configureWildFly(){
@@ -89,13 +127,21 @@ configureWildFly(){
   cat $WLF_CLI_SCRIPT2
   $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT2
   sleep 2
+  cp -f $WLF_DIRECTORY/WFL3/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL3/standalone/configuration/standalone-ha.xml.ORIG
+  cat $WLF_CLI_SCRIPT3
+  $WLF_DIRECTORY/WFL3/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT3
+  sleep 2
+  cp -f $WLF_DIRECTORY/WFL4/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL4/standalone/configuration/standalone-ha.xml.ORIG
+  cat $WLF_CLI_SCRIPT4
+  $WLF_DIRECTORY/WFL4/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT4
+  sleep 2
   echo ''
   echo '======================================='
   echo "CONFIGURE WILDFLY LOAD BALANCER"
   echo '======================================='
-  cp -f $WLF_DIRECTORY/WFL3/standalone/configuration/standalone-load-balancer.xml $WLF_DIRECTORY/WFL3/standalone/configuration/standalone-load-balancer.xml.ORIG
-  cat $WLF_CLI_SCRIPT3
-  $WLF_DIRECTORY/WFL3/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT3
+  cp -f $WLF_DIRECTORY/WFLLB/standalone/configuration/standalone-load-balancer.xml $WLF_DIRECTORY/WFLLB/standalone/configuration/standalone-load-balancer.xml.ORIG
+  cat $WLF_CLI_SCRIPTLB
+  $WLF_DIRECTORY/WFLLB/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPTLB
   sleep 2
 }
 
@@ -110,6 +156,10 @@ deployToWildFly(){
   cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/distributed-webapp.war
   sleep 2
   cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/distributed-webapp.war
+  sleep 2
+  cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL3/standalone/deployments/distributed-webapp.war
+  sleep 2
+  cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL4/standalone/deployments/distributed-webapp.war
   sleep 2
 }
 
@@ -150,11 +200,13 @@ fi
 # ========================
 export WLF_CLI_SCRIPT1=configuration.cli
 export WLF_CLI_SCRIPT2=configuration.cli
-export WLF_CLI_SCRIPT3=configuration-lb.cli
+export WLF_CLI_SCRIPT3=configuration.cli
+export WLF_CLI_SCRIPT4=configuration.cli
+export WLF_CLI_SCRIPTLB=configuration-lb.cli
 export MVN_PROFILE="-q"
 export WAR_FINAL_NAME=distributed-webapp.war
 export WAR_CONTEXT_PATH=clusterbench
-echo -e "${GREEN}\n=======================================\nUsing WLF_CLI_SCRIPT $WLF_CLI_SCRIPT1 and $WLF_CLI_SCRIPT2\nUsing WAR_FINAL_NAME $WAR_FINAL_NAME\nUsing WAR_CONTEXT_PATH $WAR_CONTEXT_PATH\nUsing JDG_CLI_SCRIPT $JDG_CLI_SCRIPT\n=======================================\n${NC}"
+echo -e "${GREEN}\n=======================================\nUsing WLF_CLI_SCRIPT $WLF_CLI_SCRIPT1 and $WLF_CLI_SCRIPTLB\nUsing WAR_FINAL_NAME $WAR_FINAL_NAME\nUsing WAR_CONTEXT_PATH $WAR_CONTEXT_PATH\n=======================================\n${NC}"
 
 mkdir -p $WLF_DIRECTORY
 
@@ -165,6 +217,8 @@ echo '======================================='
 rm -rfd $WLF_DIRECTORY/WFL1
 rm -rfd $WLF_DIRECTORY/WFL2
 rm -rfd $WLF_DIRECTORY/WFL3
+rm -rfd $WLF_DIRECTORY/WFL4
+rm -rfd $WLF_DIRECTORY/WFLLB
 rm -f /tmp/cookies1
 rm -f /tmp/cookies2
 rm -f /tmp/cookies3
@@ -181,18 +235,14 @@ configureWildFly
 sleep 1
 
 startWFLLB
-sleep 5
+sleep 10
 
 startWFL1
-sleep 5
-
 startWFL2
-sleep 5
+startWFL3
+startWFL4
+sleep 10
 
 deployToWildFly
-sleep 5
 
-#startWFLLB
-#sleep 2
-
-exitWithMsg "paste \"http://localhost:8180/$WAR_CONTEXT_PATH/session\" or \"http://localhost:8280/$WAR_CONTEXT_PATH/session\" in your browser ..."
+exitWithMsg "paste \"http://localhost:8080/distributed-webapp/home.jsp" in your browser ..."

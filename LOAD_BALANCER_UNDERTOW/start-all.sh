@@ -122,19 +122,15 @@ configureWildFly(){
   cp -f $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT1
   $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT1
-  sleep 2
   cp -f $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT2
   $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT2
-  sleep 2
   cp -f $WLF_DIRECTORY/WFL3/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL3/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT3
   $WLF_DIRECTORY/WFL3/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT3
-  sleep 2
   cp -f $WLF_DIRECTORY/WFL4/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL4/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT4
   $WLF_DIRECTORY/WFL4/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT4
-  sleep 2
   echo ''
   echo '======================================='
   echo "CONFIGURE WILDFLY LOAD BALANCER"
@@ -154,11 +150,8 @@ deployToWildFly(){
   mvn $MVN_PROFILE clean install
   cd -
   cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/distributed-webapp.war
-  sleep 2
   cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/distributed-webapp.war
-  sleep 2
   cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL3/standalone/deployments/distributed-webapp.war
-  sleep 2
   cp -fv distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL4/standalone/deployments/distributed-webapp.war
   sleep 2
 }
@@ -245,4 +238,4 @@ sleep 10
 
 deployToWildFly
 
-exitWithMsg "paste \"http://localhost:8080/distributed-webapp/home.jsp" in your browser ..."
+exitWithMsg "paste \"http://localhost:8080/distributed-webapp/home.jsp\" or \"http://localhost:8080/distributed-webapp/jboss-node-name\"in your browser ..."

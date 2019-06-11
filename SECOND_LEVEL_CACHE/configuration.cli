@@ -1,0 +1,3 @@
+embed-server --std-out=echo --server-config=standalone-ha.xml
+/subsystem=infinispan/cache-container=hibernate/replicated-cache=entity-replicated:add()
+

@@ -110,12 +110,16 @@ deployToWildFly(){
   echo '======================================='
   echo "DEPLOY TO WILDFLY"
   echo '======================================='
-  cd distributed-webapp
+  pushd distributed-webapp
   mvn $MVN_PROFILE clean install
-  cd -
+  popd
+  echo "cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/"
   cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/
+  echo "cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/"
   cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/
+  echo "cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL3/standalone/deployments/"
   cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL3/standalone/deployments/
+  echo "cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL4/standalone/deployments/"
   cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL4/standalone/deployments/
 }
 
@@ -125,9 +129,9 @@ exitWithMsg(){
     exit -1
 }
 
-# ================
+# ========================
 # START
-# ================
+# ========================
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -148,6 +152,32 @@ if [[ "x$WLF_ZIP_DOWNLOAD_URL" = "x" ]]; then
     export WLF_ZIP_DOWNLOAD_URL=https://download.jboss.org/wildfly/16.0.0.Beta1/wildfly-16.0.0.Final.zip
     echo -e "${RED}\nWARNING!\nEnvironment variable WLF_ZIP_DOWNLOAD_URL not set: default is $WLF_ZIP_DOWNLOAD_URL\n${NC}"
 fi
+
+# ========================
+# Profile
+# ========================
+if [[ "x$1" = "x" ]] || [[ "x$1" = "x--inva" ]]; then
+    echo -e "${GREEN}\n=======================================\nUsing invalidation cache\n=======================================\n${NC}"
+    export WLF_CLI_SCRIPT=configuration-inva.cli
+    export MVN_PROFILE="-q"
+    export WAR_FINAL_NAME=distributed-webapp.war
+    export WAR_CONTEXT_PATH=distributed-webapp
+elif [[ "x$1" = "x--dist" ]]; then
+    echo -e "${GREEN}\n=======================================\nUsing distributed cache\n=======================================\n${NC}"
+    export WLF_CLI_SCRIPT=configuration-dist.cli
+    export MVN_PROFILE="-q"
+    export WAR_FINAL_NAME=distributed-webapp.war
+    export WAR_CONTEXT_PATH=distributed-webapp
+elif [[ "x$1" = "x--repl" ]]; then
+    echo -e "${GREEN}\n=======================================\nUsing replicated cache\n=======================================\n${NC}"
+    export WLF_CLI_SCRIPT=configuration-repl.cli
+    export MVN_PROFILE="-q"
+    export WAR_FINAL_NAME=distributed-webapp.war
+    export WAR_CONTEXT_PATH=distributed-webapp
+else
+    exitWithMsg "Invalid first argument"
+fi
+
 
 mkdir -p $WLF_DIRECTORY
 
@@ -191,16 +221,16 @@ echo ''
 echo '======================================='
 echo "INIT DB"
 echo '======================================='
-echo  -n -e "\n http://localhost:8180/$WAR_CONTEXT_PATH/test/init"
+echo  -n -e "\n http://localhost:8180/$WAR_CONTEXT_PATH/test/init: "
 curl http://localhost:8180/$WAR_CONTEXT_PATH/test/init
 sleep 5
-echo  -n -e "\n http://localhost:8280/$WAR_CONTEXT_PATH/test/init"
+echo  -n -e "\n http://localhost:8280/$WAR_CONTEXT_PATH/test/init: "
 curl http://localhost:8280/$WAR_CONTEXT_PATH/test/init
 sleep 5
-echo  -n -e "\n http://localhost:8380/$WAR_CONTEXT_PATH/test/init"
+echo  -n -e "\n http://localhost:8380/$WAR_CONTEXT_PATH/test/init: "
 curl http://localhost:8380/$WAR_CONTEXT_PATH/test/init
 sleep 5
-echo  -n -e "\n http://localhost:8480/$WAR_CONTEXT_PATH/test/init"
+echo  -n -e "\n http://localhost:8480/$WAR_CONTEXT_PATH/test/init: "
 curl http://localhost:8480/$WAR_CONTEXT_PATH/test/init
 sleep 5
 
@@ -210,16 +240,16 @@ echo "HAMMER DB"
 echo '======================================='
 
 while true; do
-  echo -n -e "\rSESSION DATA: "
+  echo -n -e "SESSION DATA:\n\tNODE1: "
   curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8180/$WAR_CONTEXT_PATH/test/run
   sleep 1
-  echo -n -e "\n "
+  echo -n -e "\n\tNODE2: "
   curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8280/$WAR_CONTEXT_PATH/test/run
   sleep 1
-  echo -n -e "\n "
+  echo -n -e "\n\tNODE3: "
   curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8380/$WAR_CONTEXT_PATH/test/run
   sleep 1
-  echo -n -e "\n "
+  echo -n -e "\n\tNODE4: "
   curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8480/$WAR_CONTEXT_PATH/test/run
   sleep 1
   echo -n -e "\n "

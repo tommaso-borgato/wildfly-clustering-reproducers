@@ -1,4 +1,0 @@
-embed-server --std-out=echo --server-config=standalone-ha.xml
-/subsystem=infinispan/cache-container=hibernate/invalidation-cache=entity-invalidation:add()
-/subsystem=infinispan/cache-container=hibernate/invalidation-cache=entity-invalidation/component=eviction:add(max-entries=5000)
-

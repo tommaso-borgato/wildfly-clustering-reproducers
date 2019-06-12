@@ -13,11 +13,13 @@
             <property name="hibernate.cache.use_second_level_cache" value="true"/>
             <property name="hibernate.cache.use_query_cache" value="true"/>
             <property name="hibernate.generate_statistics" value="true"/>
+            <!-- Multi-Node Standalone Application - not needed in WildFLy -->
+            <property name="hibernate.cache.region.factory_class" value="infinispan"/>
             <!-- If using JPA, add to your persistence.xml: -->
-            <property name="hibernate.cache.infinispan.entity.cfg" value="entity-invalidation"/>
-            <!--<property name="hibernate.cache.infinispan.collection.cfg" value="collection-invalidation"/>
-            <property name="hibernate.cache.infinispan.query.cfg" value="query-invalidation"/>
-            <property name="hibernate.cache.infinispan.timestamp.cfg" value="timestamp-invalidation"/>-->
+            <property name="hibernate.cache.infinispan.entity.cfg" value="entity-custom-cache"/>
+            <property name="hibernate.cache.infinispan.collection.cfg" value="collection-custom-cache"/>
+            <property name="hibernate.cache.infinispan.query.cfg" value="query-custom-cache"/>
+            <property name="hibernate.cache.infinispan.timestamp.cfg" value="timestamp-custom-cache"/>
             <!-- New HHH-11147 -->
             <!--<property name="hibernate.bytecode.allow_enhancement_as_proxy" value="true"/>-->
         </properties>

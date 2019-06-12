@@ -10,6 +10,7 @@ import com.redhat.clustering.qe.distributedwebapp2lc.model.Order;
 import com.redhat.clustering.qe.distributedwebapp2lc.model.OrderSupplemental;
 import com.redhat.clustering.qe.distributedwebapp2lc.model.OrderSupplemental2;
 import com.redhat.clustering.qe.distributedwebapp2lc.model.Payment;
+import org.hibernate.Session;
 import org.hibernate.stat.Statistics;
 
 import javax.ejb.LocalBean;
@@ -61,6 +62,10 @@ public class HelloWorldEndpoint {
 	public Response doInit() {
 		final List<Long> ordersOid = new ArrayList<>();
 
+		final Statistics stats = em.unwrap(Session.class).getSessionFactory().getStatistics();
+		stats.clear();
+
+		log.log(Level.INFO, "======================================================================" );
 		for (long i=0; i<5; i++) {
 			final Address austin = new Address("Austin");
 			austin.setId(getId(i, Address.class));
@@ -121,6 +126,11 @@ public class HelloWorldEndpoint {
 			ordersOid.add(order2.getOid());
 		}
 
+		log.log(Level.INFO, "======================================================================" );
+		log.log(Level.INFO,  stats.getPrepareStatementCount() + " PrepareStatementCount" );
+		log.log(Level.INFO,  stats.getEntityInsertCount() + " EntityInsertCount" );
+		log.log(Level.INFO, "======================================================================" );
+
 		return Response.ok(ordersOid).build();
 	}
 
@@ -131,12 +141,12 @@ public class HelloWorldEndpoint {
 	public Response doRun() {
 		final List<Long> ordersOid = new ArrayList<>();
 
-		final Statistics stats = org.hibernate.internal.SessionImpl.class.cast(em.getDelegate()).getSessionFactory().getStatistics();
+		final Statistics stats = em.unwrap(Session.class).getSessionFactory().getStatistics();
 		stats.clear();
 
 		final List<Order> orders =
 				em.createQuery("select o from Order o", Order.class)
-				.setHint("org.hibernate.cacheable", Boolean.FALSE)
+				.setHint("org.hibernate.cacheable", Boolean.TRUE)
 				.getResultList();
 
 		log.log(Level.INFO, "======================================================================" );
@@ -166,6 +176,11 @@ public class HelloWorldEndpoint {
 			}
 			ordersOid.add(order.getOid());
 		}
+
+		log.log(Level.INFO, "======================================================================" );
+		log.log(Level.INFO,  stats.getPrepareStatementCount() + " PrepareStatementCount" );
+		log.log(Level.INFO,  stats.getEntityFetchCount() + " EntityFetchCount" );
+		log.log(Level.INFO, "======================================================================" );
 
 		return Response.ok(ordersOid).build();
 	}

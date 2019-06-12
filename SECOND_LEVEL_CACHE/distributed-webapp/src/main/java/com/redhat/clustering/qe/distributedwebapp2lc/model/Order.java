@@ -52,7 +52,7 @@ public class Order {
 
 	@Id
 	@Column(name = "oid")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	//@GeneratedValue(strategy = GenerationType.AUTO)
 	public Long getOid() {
 		return oid;
 	}

@@ -3,6 +3,7 @@
     <persistence-unit name="MainPU">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+        <!-- All entities and entity-related state and data are cached -->
         <shared-cache-mode>ALL</shared-cache-mode>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
@@ -11,13 +12,14 @@
             <property name="hibernate.hbm2ddl.auto" value="create"/>
             <property name="hibernate.cache.use_second_level_cache" value="true"/>
             <property name="hibernate.cache.use_query_cache" value="true"/>
+            <property name="hibernate.generate_statistics" value="true"/>
             <!-- If using JPA, add to your persistence.xml: -->
-            <property name="hibernate.cache.infinispan.entity.cfg" value="entity-replicated"/>
-            <property name="hibernate.cache.infinispan.collection.cfg" value="collection-replicated"/>
-            <property name="hibernate.cache.infinispan.query.cfg" value="query-replicated"/>
-            <property name="hibernate.cache.infinispan.timestamp.cfg" value="timestamp-replicated"/>
+            <property name="hibernate.cache.infinispan.entity.cfg" value="entity-invalidation"/>
+            <!--<property name="hibernate.cache.infinispan.collection.cfg" value="collection-invalidation"/>
+            <property name="hibernate.cache.infinispan.query.cfg" value="query-invalidation"/>
+            <property name="hibernate.cache.infinispan.timestamp.cfg" value="timestamp-invalidation"/>-->
             <!-- New HHH-11147 -->
-            <property name="hibernate.bytecode.allow_enhancement_as_proxy" value="true"/>
+            <!--<property name="hibernate.bytecode.allow_enhancement_as_proxy" value="true"/>-->
         </properties>
     </persistence-unit>
 </persistence>

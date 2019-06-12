@@ -185,54 +185,43 @@ startWFL4
 sleep 1
 
 deployToWildFly
-sleep 25
+sleep 30
 
 echo ''
 echo '======================================='
 echo "INIT DB"
 echo '======================================='
-echo "http://localhost:8180/$WAR_CONTEXT_PATH/test/init"
+echo  -n -e "\n http://localhost:8180/$WAR_CONTEXT_PATH/test/init"
 curl http://localhost:8180/$WAR_CONTEXT_PATH/test/init
-echo "http://localhost:8280/$WAR_CONTEXT_PATH/test/init"
+sleep 5
+echo  -n -e "\n http://localhost:8280/$WAR_CONTEXT_PATH/test/init"
 curl http://localhost:8280/$WAR_CONTEXT_PATH/test/init
-echo "http://localhost:8380/$WAR_CONTEXT_PATH/test/init"
+sleep 5
+echo  -n -e "\n http://localhost:8380/$WAR_CONTEXT_PATH/test/init"
 curl http://localhost:8380/$WAR_CONTEXT_PATH/test/init
-echo "http://localhost:8480/$WAR_CONTEXT_PATH/test/init"
+sleep 5
+echo  -n -e "\n http://localhost:8480/$WAR_CONTEXT_PATH/test/init"
 curl http://localhost:8480/$WAR_CONTEXT_PATH/test/init
+sleep 5
 
 echo ''
 echo '======================================='
 echo "HAMMER DB"
 echo '======================================='
-first_print=true
+
 while true; do
   echo -n -e "\rSESSION DATA: "
   curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8180/$WAR_CONTEXT_PATH/test/run
   sleep 1
-  echo -n " "
+  echo -n -e "\n "
   curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8280/$WAR_CONTEXT_PATH/test/run
   sleep 1
-  echo -n " "
+  echo -n -e "\n "
   curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8380/$WAR_CONTEXT_PATH/test/run
   sleep 1
-  echo -n " "
+  echo -n -e "\n "
   curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8480/$WAR_CONTEXT_PATH/test/run
   sleep 1
-  echo -n " "
-  curl -b /tmp/cookies4 -c /tmp/cookies4 http://localhost:8180/$WAR_CONTEXT_PATH/test/run
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies3 -c /tmp/cookies3 http://localhost:8280/$WAR_CONTEXT_PATH/test/run
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies2 -c /tmp/cookies2 http://localhost:8380/$WAR_CONTEXT_PATH/test/run
-  sleep 1
-  echo -n " "
-  curl -b /tmp/cookies1 -c /tmp/cookies1 http://localhost:8480/$WAR_CONTEXT_PATH/test/run
-  sleep 1
-  if [[ "$first_print" = true ]] ; then
-        echo -n -e "\t\t\t(press CTRL+C to exit)"
-        first_print=false
-  fi
+  echo -n -e "\n "
 done
 

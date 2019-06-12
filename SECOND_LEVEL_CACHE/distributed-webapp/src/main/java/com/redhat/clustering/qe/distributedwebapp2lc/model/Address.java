@@ -32,7 +32,7 @@ public class Address {
 
 	@Id
 	@Column(name = "oid")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	//@GeneratedValue(strategy = GenerationType.AUTO)
 	public Long getId() {
 		return id;
 	}

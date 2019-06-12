@@ -1,3 +1,10 @@
 embed-server --std-out=echo --server-config=standalone-ha.xml
 /subsystem=infinispan/cache-container=hibernate/replicated-cache=entity-replicated:add()
+/subsystem=infinispan/cache-container=hibernate/replicated-cache=entity-replicated/component=eviction:add(max-entries=5000)
+/subsystem=infinispan/cache-container=hibernate/replicated-cache=collection-replicated:add()
+/subsystem=infinispan/cache-container=hibernate/replicated-cache=collection-replicated/component=eviction:add(max-entries=5000)
+/subsystem=infinispan/cache-container=hibernate/replicated-cache=query-replicated:add()
+/subsystem=infinispan/cache-container=hibernate/replicated-cache=query-replicated/component=eviction:add(max-entries=5000)
+/subsystem=infinispan/cache-container=hibernate/replicated-cache=timestamp-replicated:add()
+/subsystem=infinispan/cache-container=hibernate/replicated-cache=timestamp-replicated/component=eviction:add(max-entries=5000)
 

@@ -5,6 +5,7 @@ startWFL1(){
   echo '======================================='
   echo "STARTING WFL1"
   echo '======================================='
+  echo "gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL1 --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100"
   gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL1 --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
 }
 
@@ -13,6 +14,7 @@ startWFL2(){
   echo '======================================='
   echo "STARTING WFL2"
   echo '======================================='
+  echo "gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200"
   gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
 }
 
@@ -21,6 +23,7 @@ startWFL3(){
   echo '======================================='
   echo "STARTING WFL3"
   echo '======================================='
+  echo "gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL3 --title="WFL3" -- $WLF_DIRECTORY/WFL3/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL3 -Djboss.node.name=WFL3 -Djboss.socket.binding.port-offset=300"
   gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL3 --title="WFL3" -- $WLF_DIRECTORY/WFL3/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL3 -Djboss.node.name=WFL3 -Djboss.socket.binding.port-offset=300
 }
 
@@ -29,6 +32,7 @@ startWFL4(){
   echo '======================================='
   echo "STARTING WFL4"
   echo '======================================='
+  echo "gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL4 --title="WFL4" -- $WLF_DIRECTORY/WFL4/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL4 -Djboss.node.name=WFL4 -Djboss.socket.binding.port-offset=400"
   gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL4 --title="WFL4" -- $WLF_DIRECTORY/WFL4/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL4 -Djboss.node.name=WFL4 -Djboss.socket.binding.port-offset=400
 }
 
@@ -96,13 +100,9 @@ configureWildFly(){
   echo "CONFIGURE WILDFLY"
   echo '======================================='
   $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT
-  sleep 2
   $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT
-  sleep 2
   $WLF_DIRECTORY/WFL3/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT
-  sleep 2
   $WLF_DIRECTORY/WFL4/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT
-  sleep 2
 }
 
 deployToWildFly(){
@@ -114,13 +114,9 @@ deployToWildFly(){
   mvn $MVN_PROFILE clean install
   cd -
   cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/
-  sleep 5
   cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/
-  sleep 5
   cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL3/standalone/deployments/
-  sleep 5
   cp -f distributed-webapp/target/$WAR_FINAL_NAME $WLF_DIRECTORY/WFL4/standalone/deployments/
-  sleep 5
 }
 
 exitWithMsg(){
@@ -189,14 +185,20 @@ startWFL4
 sleep 1
 
 deployToWildFly
-sleep 5
+sleep 25
 
 echo ''
 echo '======================================='
 echo "INIT DB"
 echo '======================================='
-echo 'http://localhost:8180/$WAR_CONTEXT_PATH/test/init'
+echo "http://localhost:8180/$WAR_CONTEXT_PATH/test/init"
 curl http://localhost:8180/$WAR_CONTEXT_PATH/test/init
+echo "http://localhost:8280/$WAR_CONTEXT_PATH/test/init"
+curl http://localhost:8280/$WAR_CONTEXT_PATH/test/init
+echo "http://localhost:8380/$WAR_CONTEXT_PATH/test/init"
+curl http://localhost:8380/$WAR_CONTEXT_PATH/test/init
+echo "http://localhost:8480/$WAR_CONTEXT_PATH/test/init"
+curl http://localhost:8480/$WAR_CONTEXT_PATH/test/init
 
 echo ''
 echo '======================================='

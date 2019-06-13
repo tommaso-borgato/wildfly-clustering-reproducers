@@ -144,12 +144,16 @@ public class HelloWorldEndpoint {
 		final Statistics stats = em.unwrap(Session.class).getSessionFactory().getStatistics();
 		stats.clear();
 
+		boolean isFirstOrderIn2LC = em.getEntityManagerFactory().getCache().contains(Order.class, Long.parseLong("1"));
+		Order firstOrder = em.find(Order.class, Long.parseLong("1"));
+
 		final List<Order> orders =
 				em.createQuery("select o from Order o", Order.class)
-				.setHint("org.hibernate.cacheable", Boolean.TRUE)
+				//.setHint("org.hibernate.cacheable", Boolean.TRUE)
 				.getResultList();
 
-		log.log(Level.INFO, "======================================================================" );
+		log.log(Level.INFO, "========================= isFirstOrderIn2LC: " + isFirstOrderIn2LC + " ====================" );
+		log.log(Level.INFO, "========================= firstOrder: " + (firstOrder==null? "null" : firstOrder.getOid()) + " ==============================" );
 		for ( Order order : orders ) {
 			log.log(Level.INFO, "############################################" );
 			log.log(Level.INFO, "Starting Order #" + order.getOid() );

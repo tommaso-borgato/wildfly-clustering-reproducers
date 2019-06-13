@@ -18,8 +18,8 @@
             <!-- If using JPA, add to your persistence.xml: -->
             <property name="hibernate.cache.infinispan.entity.cfg" value="entity-custom-cache"/>
             <property name="hibernate.cache.infinispan.collection.cfg" value="collection-custom-cache"/>
-            <property name="hibernate.cache.infinispan.query.cfg" value="query-custom-cache"/>
-            <property name="hibernate.cache.infinispan.timestamp.cfg" value="timestamp-custom-cache"/>
+            <!--<property name="hibernate.cache.infinispan.query.cfg" value="query-custom-cache"/>-->
+            <!--<property name="hibernate.cache.infinispan.timestamp.cfg" value="timestamp-custom-cache"/>-->
             <!-- New HHH-11147 -->
             <!--<property name="hibernate.bytecode.allow_enhancement_as_proxy" value="true"/>-->
         </properties>

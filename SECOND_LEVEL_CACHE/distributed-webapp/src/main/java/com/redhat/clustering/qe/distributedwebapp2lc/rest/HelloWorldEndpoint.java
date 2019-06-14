@@ -152,6 +152,7 @@ public class HelloWorldEndpoint {
 				//.setHint("org.hibernate.cacheable", Boolean.TRUE)
 				.getResultList();
 
+		// inconsistency
 		log.log(Level.INFO, "========================= isFirstOrderIn2LC: " + isFirstOrderIn2LC + " ====================" );
 		log.log(Level.INFO, "========================= firstOrder: " + (firstOrder==null? "null" : firstOrder.getOid()) + " ==============================" );
 		for ( Order order : orders ) {

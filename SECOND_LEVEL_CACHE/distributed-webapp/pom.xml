@@ -47,4 +47,35 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>custom-cache</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>2.4</version>
+            <executions>
+              <!-- Build offload configuration: passivation enabled and a special offload cache. -->
+              <execution>
+                <phase>package</phase>
+                <id>distributable-web-1</id>
+                <goals>
+                  <goal>war</goal>
+                </goals>
+                <configuration>
+                  <classifier>distributable-web-1</classifier>
+                  <warSourceDirectory>${basedir}/src/main/webapp-distributable-web-1
+                  </warSourceDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>

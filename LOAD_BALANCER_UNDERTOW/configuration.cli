@@ -8,4 +8,4 @@ embed-server --std-out=echo --server-config=standalone-ha.xml
 /subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=advertise,value=false)
 /socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=undertow_load_balancer:add(host=127.0.0.1,port=8090)
 /subsystem=modcluster/mod-cluster-config=configuration:list-add(name=proxies,value=undertow_load_balancer)
-/subsystem=distributable-web/infinispan-session-management=default/affinity=ranked:add(max-routes=2)
+/subsystem=distributable-web/infinispan-session-management=default/affinity=ranked:add(max-routes=2,delimiter=":")

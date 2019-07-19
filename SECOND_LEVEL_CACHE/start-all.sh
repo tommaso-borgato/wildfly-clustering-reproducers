@@ -125,7 +125,8 @@ deployToWildFly(){
 
 exitWithMsg(){
     echo "$1"
-    echo "e.g.: $0 "
+    echo "e.g.: $0 [--default|--inva|--dist|--repl]"
+    echo "depending on the cache you want to use; default suggested is '--default'"
     exit -1
 }
 
@@ -156,26 +157,30 @@ fi
 # ========================
 # Profile
 # ========================
-if [[ "x$1" = "x" ]] || [[ "x$1" = "x--inva" ]]; then
+if [[ "x$1" = "x--inva" ]]; then
     echo -e "${GREEN}\n=======================================\nUsing invalidation cache\n=======================================\n${NC}"
     export WLF_CLI_SCRIPT=configuration-inva.cli
-    export MVN_PROFILE="-q"
+    export MVN_PROFILE="-q -P custom-cache"
     export WAR_FINAL_NAME=distributed-webapp.war
     export WAR_CONTEXT_PATH=distributed-webapp
 elif [[ "x$1" = "x--dist" ]]; then
     echo -e "${GREEN}\n=======================================\nUsing distributed cache\n=======================================\n${NC}"
     export WLF_CLI_SCRIPT=configuration-dist.cli
-    export MVN_PROFILE="-q"
+    export MVN_PROFILE="-q -P custom-cache"
     export WAR_FINAL_NAME=distributed-webapp.war
     export WAR_CONTEXT_PATH=distributed-webapp
 elif [[ "x$1" = "x--repl" ]]; then
     echo -e "${GREEN}\n=======================================\nUsing replicated cache\n=======================================\n${NC}"
     export WLF_CLI_SCRIPT=configuration-repl.cli
-    export MVN_PROFILE="-q"
+    export MVN_PROFILE="-q -P custom-cache"
     export WAR_FINAL_NAME=distributed-webapp.war
     export WAR_CONTEXT_PATH=distributed-webapp
 else
-    exitWithMsg "Invalid first argument"
+    echo -e "${GREEN}\n=======================================\nUsing default cache\n=======================================\n${NC}"
+    export WLF_CLI_SCRIPT=configuration-default.cli
+    export MVN_PROFILE="-q"
+    export WAR_FINAL_NAME=distributed-webapp.war
+    export WAR_CONTEXT_PATH=distributed-webapp
 fi
 
 

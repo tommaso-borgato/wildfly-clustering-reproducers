@@ -1,0 +1,1 @@
+embed-server --std-out=echo --server-config=standalone-ha.xml

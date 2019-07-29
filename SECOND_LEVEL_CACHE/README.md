@@ -20,7 +20,8 @@ In `persistence.xml` we add the following:
 ```xml
     <property name="hibernate.cache.infinispan.entity.cfg" value="entity-replicated"/>
 ```
-This has the effect of using the Infinispan cache `entity-replicated` as the template for entities's caches;
+This has the effect of using the Infinispan cache `entity-replicated` as a custom cache template for entities's caches 
+(reference here: https://access.redhat.com/documentation/en-us/red_hat_data_grid/7.3/html/red_hat_data_grid_user_guide/integrations);
   
 In the `standalone-ha.xml`, we have an `invalidation-cache` named `entity` in the cache container `hibernate` of
 the Infinispan subsystem;

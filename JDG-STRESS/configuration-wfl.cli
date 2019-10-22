@@ -1,0 +1,12 @@
+embed-server --std-out=echo --server-config=standalone-ha.xml
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=hotrodserver1:add(host=127.0.0.1,port=11522)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=hotrodserver2:add(host=127.0.0.1,port=11622)
+batch
+/subsystem=infinispan/remote-cache-container=web-sessions:add(default-remote-cluster=jdg-server-cluster)
+/subsystem=infinispan/remote-cache-container=web-sessions/remote-cluster=jdg-server-cluster:add(socket-bindings=[hotrodserver1,hotrodserver2])
+run-batch
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload:add()
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=hotrod:add(remote-cache-container=web-sessions, fetch-state=false, preload=false, passivation=false, purge=false, shared=false)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=locking:add(isolation=REPEATABLE_READ)
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=transaction:add(mode=BATCH)
+/subsystem=infinispan/cache-container=web:write-attribute(name=default-cache,value=offload)

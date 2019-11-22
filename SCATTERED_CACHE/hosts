@@ -1,0 +1,8 @@
+[wildfly_node_1]
+127.0.0.1
+
+[wildfly_node_2]
+127.0.0.1
+
+[client_node]
+127.0.0.1

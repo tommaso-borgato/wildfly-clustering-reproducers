@@ -1,0 +1,23 @@
+---
+- hosts: wildfly_node_1
+  roles:
+    - role: wildfly
+      vars:
+        root_folder: /tmp/SCATTERED_CACHE/wildfly1
+        wildfly_node_name: wildfly1
+        wildfly_port_offset: 100
+
+- hosts: wildfly_node_2
+  roles:
+    - role: wildfly
+      vars:
+        root_folder: /tmp/SCATTERED_CACHE/wildfly2
+        wildfly_node_name: wildfly2
+        wildfly_port_offset: 200
+
+- hosts: client_node
+  roles:
+    - role: client
+      vars:
+        root_folder: /tmp/SCATTERED_CACHE/client
+        wildfly_node_name: wildfly2

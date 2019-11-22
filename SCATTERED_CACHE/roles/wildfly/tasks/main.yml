@@ -1,0 +1,54 @@
+# cleanup
+- name: remove {{ root_folder }}
+  file:
+    path: "{{ root_folder }}"
+    state: absent
+
+# first node
+- name: remove {{ root_folder }}/tmp
+  file:
+    path: "{{ root_folder }}/tmp/"
+    state: absent
+
+- name: Create {{ root_folder }}/tmp if it does not exist
+  file:
+    path: "{{ root_folder }}/tmp"
+    state: directory
+    mode: '0755'
+
+- name: Unarchive wildfly to {{ root_folder }}/tmp
+  unarchive:
+    src: /home/tborgato/Downloads/wildfly-18.0.0.Final.zip
+    dest: "{{ root_folder }}/tmp"
+
+- name: Move {{ root_folder }}/tmp to {{ wildfly_node_name }}
+  shell: |
+    ls -1 {{ root_folder }}/tmp | xargs -I {} mv -f {{ root_folder }}/tmp/{} {{ root_folder }}/{{ wildfly_node_name }}
+
+- name: Create wildfly.cli on remote node {{ wildfly_node_name }}
+  copy:
+    content: |
+      embed-server --server-config=standalone-ha.xml
+      /subsystem=jgroups/channel=ee:write-attribute(name=stack,value=tcp)
+      /subsystem=infinispan/cache-container=web/scattered-cache=testScattered:add()
+      /subsystem=infinispan/cache-container=web/scattered-cache=testScattered/component=state-transfer:add(timeout=0)
+      /subsystem=infinispan/cache-container=web:write-attribute(name=default-cache, value=testScattered)
+    dest: "{{ root_folder }}/{{ wildfly_node_name }}.cli"
+
+- name: configure {{ wildfly_node_name }}
+  shell: |
+    {{ root_folder }}/{{ wildfly_node_name }}/bin/jboss-cli.sh --file={{ root_folder }}/{{ wildfly_node_name }}.cli
+
+- name: start {{ wildfly_node_name }}
+  shell: |
+    WFL=$(pkill -9 -f "java.*-Dprogram.name={{ wildfly_node_name }}") || :
+    JBOSS_PIDFILE="{{ root_folder }}/pidfile"
+    JBOSS_HOME="{{ root_folder }}/{{ wildfly_node_name }}"
+    JBOSS_BASE_DIR="{{ root_folder }}/{{ wildfly_node_name }}"
+    LAUNCH_JBOSS_IN_BACKGROUND=1
+    nohup $JBOSS_HOME/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name={{ wildfly_node_name }} -Djboss.node.name={{ wildfly_node_name }} -Djboss.socket.binding.port-offset={{ wildfly_port_offset }} > {{ root_folder }}/server.log 2>&1 &
+
+- name: Deploy clusterbench-ee8.ear to {{ wildfly_node_name }}
+  copy:
+    src: clusterbench-ee8.ear
+    dest: "{{ root_folder }}/{{ wildfly_node_name }}/standalone/deployments"

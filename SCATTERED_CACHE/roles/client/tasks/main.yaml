@@ -12,34 +12,18 @@
 
 - name: culr {{ groups['wildfly_node_1'][0] }}:8180 and {{ groups['wildfly_node_2'][0] }}:8280
   shell: |
+    echo curl -b {{ root_folder }}/cookies1 -c {{ root_folder }}/cookies1 http://{{ groups['wildfly_node_1'][0] }}:8180/clusterbench/session
+    echo curl -b {{ root_folder }}/cookies2 -c {{ root_folder }}/cookies2 http://{{ groups['wildfly_node_2'][0] }}:8280/clusterbench/session
     hammerNodes(){
       while true; do
-        echo -n -e "\rSESSION DATA: "
-        curl -b {{ root_folder }}/cookies1 -c {{ root_folder }}/cookies1 http://{{ groups['wildfly_node_1'][0] }}:8180/clusterbench/session
+        for mynum in `seq 1 100`; do
+          curl -b {{ root_folder }}/cookie-${mynum} -c {{ root_folder }}/cookie-${mynum} http://{{ groups['wildfly_node_1'][0] }}:8180/clusterbench/session
+        done
         sleep 1
-        echo -n " "
-        curl -b {{ root_folder }}/cookies2 -c {{ root_folder }}/cookies2 http://{{ groups['wildfly_node_2'][0] }}:8280/clusterbench/session
-        sleep 1
-        echo -n " "
-        curl -b {{ root_folder }}/cookies3 -c {{ root_folder }}/cookies3 http://{{ groups['wildfly_node_1'][0] }}:8180/clusterbench/session
-        sleep 1
-        echo -n " "
-        curl -b {{ root_folder }}/cookies4 -c {{ root_folder }}/cookies4 http://{{ groups['wildfly_node_2'][0] }}:8280/clusterbench/session
-        sleep 1
-        echo -n " "
-        curl -b {{ root_folder }}/cookies4 -c {{ root_folder }}/cookies4 http://{{ groups['wildfly_node_1'][0] }}:8180/clusterbench/session
-        sleep 1
-        echo -n " "
-        curl -b {{ root_folder }}/cookies3 -c {{ root_folder }}/cookies3 http://{{ groups['wildfly_node_2'][0] }}:8280/clusterbench/session
-        sleep 1
-        echo -n " "
-        curl -b {{ root_folder }}/cookies2 -c {{ root_folder }}/cookies2 http://{{ groups['wildfly_node_1'][0] }}:8180/clusterbench/session
-        sleep 1
-        echo -n " "
-        curl -b {{ root_folder }}/cookies1 -c {{ root_folder }}/cookies1 http://{{ groups['wildfly_node_2'][0] }}:8280/clusterbench/session
+        for mynum in `seq 1 100`; do
+          curl -b {{ root_folder }}/cookie-${mynum} -c {{ root_folder }}/cookie-${mynum} http://{{ groups['wildfly_node_2'][0] }}:8280/clusterbench/session
+        done
         sleep 1
       done
     }
-    echo curl -b {{ root_folder }}/cookies1 -c {{ root_folder }}/cookies1 http://{{ groups['wildfly_node_1'][0] }}:8180/clusterbench/session
-    echo curl -b {{ root_folder }}/cookies2 -c {{ root_folder }}/cookies2 http://{{ groups['wildfly_node_2'][0] }}:8280/clusterbench/session
     hammerNodes > {{ root_folder }}/client.log 2>&1

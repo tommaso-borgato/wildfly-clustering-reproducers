@@ -1,14 +1,17 @@
 # cleanup
+- name: kill {{ wildfly_node_name }}
+  script: wildfly-kill.sh {{ wildfly_node_name }}
+
 - name: remove {{ root_folder }}
   file:
     path: "{{ root_folder }}"
     state: absent
 
-# first node
-- name: remove {{ root_folder }}/tmp
+- name: Create {{ root_folder }} if it does not exist
   file:
-    path: "{{ root_folder }}/tmp/"
-    state: absent
+    path: "{{ root_folder }}"
+    state: directory
+    mode: '0755'
 
 - name: Create {{ root_folder }}/tmp if it does not exist
   file:
@@ -25,7 +28,7 @@
   shell: |
     ls -1 {{ root_folder }}/tmp | xargs -I {} mv -f {{ root_folder }}/tmp/{} {{ root_folder }}/{{ wildfly_node_name }}
 
-- name: Create wildfly.cli on remote node {{ wildfly_node_name }}
+- name: Create {{ wildfly_node_name }}.cli
   copy:
     content: |
       embed-server --server-config=standalone-ha.xml
@@ -37,11 +40,12 @@
 
 - name: configure {{ wildfly_node_name }}
   shell: |
-    {{ root_folder }}/{{ wildfly_node_name }}/bin/jboss-cli.sh --file={{ root_folder }}/{{ wildfly_node_name }}.cli
+    ./bin/jboss-cli.sh --file={{ root_folder }}/{{ wildfly_node_name }}.cli
+  args:
+    chdir: "{{ root_folder }}/{{ wildfly_node_name }}"
 
 - name: start {{ wildfly_node_name }}
   shell: |
-    WFL=$(pkill -9 -f "java.*-Dprogram.name={{ wildfly_node_name }}") || :
     JBOSS_PIDFILE="{{ root_folder }}/pidfile"
     JBOSS_HOME="{{ root_folder }}/{{ wildfly_node_name }}"
     JBOSS_BASE_DIR="{{ root_folder }}/{{ wildfly_node_name }}"
@@ -52,3 +56,17 @@
   copy:
     src: clusterbench-ee8.ear
     dest: "{{ root_folder }}/{{ wildfly_node_name }}/standalone/deployments"
+
+- name: Create {{ wildfly_node_name }}-reload.cli
+  copy:
+    content: |
+      connect {{ ansible_host }}:{{ 9990 + wildfly_port_offset }}
+      reload
+    dest: "{{ root_folder }}/{{ wildfly_node_name }}-reload.cli"
+
+- name: Create {{ wildfly_node_name }}-reload.sh
+  copy:
+    content: |
+      {{ root_folder }}/{{ wildfly_node_name }}/bin/jboss-cli.sh --file={{ root_folder }}/{{ wildfly_node_name }}-reload.cli
+    dest: "{{ root_folder }}/{{ wildfly_node_name }}-reload.sh"
+    mode: u=rwx,g=rwx,o=r

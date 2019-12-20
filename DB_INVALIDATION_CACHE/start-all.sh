@@ -12,7 +12,21 @@ startMYSQL(){
     -e MYSQL_USER=pippo.baudo \
     -e MYSQL_PASSWORD=123pippobaudo \
     mysql
-    echo "JDBC_URL=jdbc:mysql://localhost:3306/clustering USER=pippo.baudo PASSWORD=123pippobaudo"
+  echo "JDBC_URL=jdbc:mysql://localhost:3306/clustering USER=pippo.baudo PASSWORD=123pippobaudo"
+  echo "Starting mysql ..."
+  sleep 30
+}
+
+startSYBASE(){
+  echo ''
+  echo '======================================='
+  echo "STARTING SYBASE"
+  echo '======================================='
+  gnome-terminal --geometry=140x35 --window --zoom=0.8 --title="SYBASE" -- \
+    podman run --name=sybase --rm --network host datagrip/sybase
+  echo "JDBC_URL=jdbc:sybase:Tds:localhost:5000/testdb USER=tester PASSWORD=guest1234"
+  echo "Starting sybase ..."
+  sleep 50
 }
 
 startWFL1(){
@@ -22,6 +36,7 @@ startWFL1(){
   echo $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
   echo '======================================='
   gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL1 --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
+  sleep 10
 }
 
 startWFL2(){
@@ -31,6 +46,7 @@ startWFL2(){
   echo $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
   echo '======================================='
   gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
+  sleep 10
 }
 
 addUsersWildFly(){
@@ -82,11 +98,9 @@ configureWildFly(){
   cp -f $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL1/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT_TMP_1
   $WLF_DIRECTORY/WFL1/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_1
-  sleep 2
   cp -f $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml $WLF_DIRECTORY/WFL2/standalone/configuration/standalone-ha.xml.ORIG
   cat $WLF_CLI_SCRIPT_TMP_2
   $WLF_DIRECTORY/WFL2/bin/jboss-cli.sh --file=$WLF_CLI_SCRIPT_TMP_2
-  sleep 2
 }
 
 deployToWildFly(){
@@ -94,18 +108,18 @@ deployToWildFly(){
   echo '======================================='
   echo "DEPLOY TO WILDFLY"
   echo '======================================='
-  cp -fv ./mysql-connector-java-8.0.18.jar $WLF_DIRECTORY/WFL1/standalone/deployments/mysql-connector.jar
-  cp -fv ./mysql-connector-java-8.0.18.jar $WLF_DIRECTORY/WFL2/standalone/deployments/mysql-connector.jar
-  sleep 20
+  #cp -fv ./$JDBC_DRIVER_JAR $WLF_DIRECTORY/WFL1/standalone/deployments/jdbc-connector.jar
+  #cp -fv ./$JDBC_DRIVER_JAR $WLF_DIRECTORY/WFL2/standalone/deployments/jdbc-connector.jar
+  #sleep 25
   cp -fv ./$EAR_FINAL_NAME $WLF_DIRECTORY/WFL1/standalone/deployments/
-  sleep 5
+  sleep 10
   cp -fv ./$EAR_FINAL_NAME $WLF_DIRECTORY/WFL2/standalone/deployments/
-  sleep 5
+  sleep 10
 }
 
 exitWithMsg(){
     echo -e "${RED}$1"
-    echo "e.g.: $0"
+    echo "e.g.: $0 [--mysql|--sybase]"
     echo "NOTE: set ...."
     exit -1
 }
@@ -118,9 +132,6 @@ GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 export WLF_DIRECTORY=/tmp/DB_INVALIDATION_CACHE
 export EAR_FINAL_NAME=cbnc.ear
-export WLF_CLI_SCRIPT=database.cli
-
-mkdir -p $WLF_DIRECTORY
 
 echo ''
 echo '======================================='
@@ -134,7 +145,22 @@ rm -f /tmp/cookies3
 rm -f /tmp/cookies4
 sleep 1
 
-startMYSQL
+# ========================
+# Profile
+# ========================
+if [[ "x$1" = "x--mysql" ]]; then
+    export WLF_CLI_SCRIPT=database-mysql.cli
+    export JDBC_DRIVER_JAR=mysql-connector.jar
+    startMYSQL
+elif [[ "x$1" = "x--sybase" ]]; then
+    export WLF_CLI_SCRIPT=database-sybase.cli
+    export JDBC_DRIVER_JAR=sybase-jconn4.jar
+    startSYBASE
+else
+    exitWithMsg "Invalid database argument"
+fi
+
+mkdir -p $WLF_DIRECTORY
 
 installWildFly
 

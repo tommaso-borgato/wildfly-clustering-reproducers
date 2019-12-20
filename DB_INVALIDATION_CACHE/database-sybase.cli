@@ -1,15 +1,16 @@
 embed-server --server-config=standalone-ha.xml
 /subsystem=jgroups/channel=ee:write-attribute(name=stack,value=tcp)
+deploy sybase-jconn4.jar
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload:add()
 /subsystem=infinispan/cache-container=web/invalidation-cache==offload/component=transaction:write-attribute(name=mode, value=BATCH)
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=locking:write-attribute(name=isolation, value=REPEATABLE_READ)
-data-source add --name=testDS --jndi-name=java:jboss/datasources/testDS --driver-name=mysql-connector.jar --connection-url=jdbc:mysql://localhost:3306/clustering --enabled=true --jta=true --use-java-context=true --transaction-isolation=TRANSACTION_READ_COMMITTED --min-pool-size=1 --max-pool-size=5 --pool-prefill=true --user-name=pippo.baudo --password=123pippobaudo --prepared-statements-cache-size=32 --share-prepared-statements=true
-/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc:add(data-source=testDS,fetch-state=false,passivation=false,purge=false,shared=true,dialect=MYSQL){allow-resource-service-restart=true}
+data-source add --name=testDS --jndi-name=java:jboss/datasources/testDS --driver-name=sybase-jconn4.jar --connection-url=jdbc:sybase:Tds:localhost:5000/testdb --enabled=true --jta=true --use-java-context=true --transaction-isolation=TRANSACTION_READ_COMMITTED --min-pool-size=1 --max-pool-size=5 --pool-prefill=true --user-name=tester --password=guest1234 --prepared-statements-cache-size=32 --share-prepared-statements=true
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc:add(data-source=testDS,fetch-state=false,passivation=false,purge=false,shared=true,dialect=SYBASE){allow-resource-service-restart=true}
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=prefix,value=s)
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=id-column.name,value=id)
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=id-column.type,value=VARCHAR(255))
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=data-column.name,value=datum)
-/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=data-column.type,value=VARBINARY(10000))
+/subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=data-column.type,value=VARBINARY)
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=timestamp-column.name,value=version)
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/store=jdbc/table=string:write-attribute(name=timestamp-column.type,value=BIGINT)
 /subsystem=infinispan/cache-container=web:write-attribute(name=default-cache, value=offload)

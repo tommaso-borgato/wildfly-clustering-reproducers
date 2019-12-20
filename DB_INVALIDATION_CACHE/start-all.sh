@@ -70,7 +70,7 @@ installWildFly(){
     echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL1"
     echo '======================================='
     unzip -d $WLF_DIRECTORY/tmp-wildfly $WLF_ZIP > /dev/null
-    mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFL1
+    mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFL1 || mv $WLF_DIRECTORY/tmp-wildfly/jboss-eap-* $WLF_DIRECTORY/WFL1
     rm -fdr $WLF_DIRECTORY/tmp-wildfly
   fi
   if [[ ! -d "$WLF_DIRECTORY/WFL2" ]] ; then
@@ -79,7 +79,7 @@ installWildFly(){
     echo "UNZIP WILDFLY to $WLF_DIRECTORY/WFL2"
     echo '======================================='
     unzip -d $WLF_DIRECTORY/tmp-wildfly $WLF_ZIP > /dev/null
-    mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFL2
+    mv $WLF_DIRECTORY/tmp-wildfly/wildfly* $WLF_DIRECTORY/WFL2 || mv $WLF_DIRECTORY/tmp-wildfly/jboss-eap-* $WLF_DIRECTORY/WFL2
     rm -fdr $WLF_DIRECTORY/tmp-wildfly
   fi
 }

@@ -150,11 +150,11 @@ sleep 1
 # ========================
 if [[ "x$1" = "x--mysql" ]]; then
     export WLF_CLI_SCRIPT=database-mysql.cli
-    export JDBC_DRIVER_JAR=mysql-connector.jar
+    export JDBC_DRIVER_JAR=jdbc-drivers/mysql-connector.jar
     startMYSQL
 elif [[ "x$1" = "x--sybase" ]]; then
     export WLF_CLI_SCRIPT=database-sybase.cli
-    export JDBC_DRIVER_JAR=sybase-jconn4.jar
+    export JDBC_DRIVER_JAR=jdbc-drivers/sybase-jconn4.jar
     startSYBASE
 else
     exitWithMsg "Invalid database argument"
@@ -176,5 +176,7 @@ deployToWildFly
 
 sleep 20
 
+echo "curl http://localhost:8180/clusterbench/session"
 curl http://localhost:8180/clusterbench/session
+echo "curl http://localhost:8280/clusterbench/session"
 curl http://localhost:8280/clusterbench/session

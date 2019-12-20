@@ -1,6 +1,6 @@
 embed-server --server-config=standalone-ha.xml
 /subsystem=jgroups/channel=ee:write-attribute(name=stack,value=tcp)
-deploy sybase-jconn4.jar
+deploy jdbc-drivers/sybase-jconn4.jar
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload:add()
 /subsystem=infinispan/cache-container=web/invalidation-cache==offload/component=transaction:write-attribute(name=mode, value=BATCH)
 /subsystem=infinispan/cache-container=web/invalidation-cache=offload/component=locking:write-attribute(name=isolation, value=REPEATABLE_READ)

@@ -5,41 +5,11 @@ startNGINX(){
   echo '======================================='
   echo "STARTING NGINX"
   echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.8 --title="NGINX" -- \
+  dbus-launch gnome-terminal --geometry=140x35 --window --zoom=0.8 --title="NGINX" -- \
     podman run --name=nginx --rm --network host \
     -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
     nginx
   sleep 3
-}
-
-startSYBASE(){
-  echo ''
-  echo '======================================='
-  echo "STARTING SYBASE"
-  echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.8 --title="SYBASE" -- \
-    podman run --name=sybase --rm --network host datagrip/sybase
-  echo "JDBC_URL=jdbc:sybase:Tds:localhost:5000/testdb USER=tester PASSWORD=guest1234"
-  echo "Starting sybase ..."
-  sleep 50
-}
-
-startDB2(){
-  echo ''
-  echo '======================================='
-  echo "STARTING DB2"
-  echo '======================================='
-  rm -rfd /tmp/database
-  mkdir -p /tmp/database
-  gnome-terminal --geometry=140x35 --window --zoom=0.8 --title="DB2" -- \
-    podman run -h db2server_ --name db2server --rm \
-      --volume=/tmp/database:/database \
-      --privileged=true --network host \
-      --env-file .env_list \
-      store/ibmcorp/db2_developer_c:11.1.4.4-x86_64
-  echo "JDBC_URL=jdbc:sybase:Tds:localhost:5000/testdb USER=tester PASSWORD=guest1234"
-  echo "Starting sybase ..."
-  sleep 50
 }
 
 startWFL1(){
@@ -48,7 +18,7 @@ startWFL1(){
   echo "STARTING WFL1"
   echo $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
   echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL1 --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
+  dbus-launch gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL1 --title="WFL1" -- $WLF_DIRECTORY/WFL1/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL1 -Djboss.node.name=WFL1 -Djboss.socket.binding.port-offset=100
   sleep 10
 }
 
@@ -58,7 +28,7 @@ startWFL2(){
   echo "STARTING WFL2"
   echo $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
   echo '======================================='
-  gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
+  dbus-launch gnome-terminal --geometry=140x35 --window --zoom=0.8 --working-directory=$WLF_DIRECTORY/WFL2 --title="WFL2" -- $WLF_DIRECTORY/WFL2/bin/standalone.sh --server-config=standalone-ha.xml -Dprogram.name=WFL2 -Djboss.node.name=WFL2 -Djboss.socket.binding.port-offset=200
   sleep 10
 }
 
@@ -149,10 +119,6 @@ echo "REMOVE PREVIOUS WILDFLY INSTALLATIONS"
 echo '======================================='
 rm -rfd $WLF_DIRECTORY/WFL1
 rm -rfd $WLF_DIRECTORY/WFL2
-rm -f /tmp/cookies1
-rm -f /tmp/cookies2
-rm -f /tmp/cookies3
-rm -f /tmp/cookies4
 sleep 1
 
 export WLF_CLI_SCRIPT=wildfly.cli
@@ -175,16 +141,13 @@ sleep 20
 
 startNGINX
 
+rm -f /tmp/cookies*
 while true; do
-  echo -n "curl http://127.0.0.1:8180/clusterbench/session /tmp/cookies1: "
-  curl  -b /tmp/cookies1 -c /tmp/cookies1 http://127.0.0.1:8180/clusterbench/session
-  echo -n " /tmp/cookies3: "
-  curl  -b /tmp/cookies3 -c /tmp/cookies3 http://127.0.0.1:8180/clusterbench/session
-  echo " "
-  echo -n "curl http://127.0.0.1:8280/clusterbench/session /tmp/cookies2: "
-  curl  -b /tmp/cookies2 -c /tmp/cookies2 http://127.0.0.1:8280/clusterbench/session
-  echo -n " /tmp/cookies4: "
-  curl  -b /tmp/cookies4 -c /tmp/cookies4 http://127.0.0.1:8280/clusterbench/session
+  for cookieNum in {1..100}
+  do
+    echo -n "curl  -b /tmp/cookies$cookieNum -c /tmp/cookies$cookieNum http://127.0.0.1/clusterbench/session: "
+    curl  -b /tmp/cookies$cookieNum -c /tmp/cookies$cookieNum http://127.0.0.1/clusterbench/session
+    echo " "
+  done
   sleep 1
-  echo " "
 done

@@ -1,0 +1,3 @@
+embed-server --server-config=standalone-ha.xml
+/subsystem=jgroups/channel=ee:write-attribute(name=stack,value=tcp)
+/subsystem=transactions:write-attribute(name=node-identifier,value=_NODE_IDENTIFIER_)
